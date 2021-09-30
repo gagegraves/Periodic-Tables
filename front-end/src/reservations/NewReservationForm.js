@@ -1,30 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-export default function Reservations() {
+export default function NewReservationForm() {
   const history = useHistory();
   const initialFormState = {
-    firstName: "",
-    lastName: "",
-    phone: "",
-    date: "",
-    time: "",
-    guests: "",
+    first_name: "",
+    last_name: "",
+    mobile_phone: "",
+    reservation_date: "",
+    reservation_time: "",
+    people: "",
   };
 
   const [formData, setFormData] = useState({ ...initialFormState });
 
+  
+
   const handleChange = ({ target }) => {
-    setFormData({
-      ...formData,
-      [target.name]: target.value,
-    });
+    setFormData({ ...formData, [target.name]: target.value });
   };
 
-  const handleSubmit = (event) => {
+ async function handleSubmit(event) {
     event.preventDefault();
-    console.log(formData);
+    
     setFormData({ ...initialFormState });
+    history.push(`/dashboard?date=${formData.reservation_date}`)
   };
 
   //   const submitHandler = async (event) => {
@@ -44,69 +44,69 @@ export default function Reservations() {
     <>
       <div>
         <form onSubmit={handleSubmit}>
-          <label htmlFor="firstName">
+          <label htmlFor="first_name">
             First Name
             <input
-              id="firstName"
+              id="first_name"
               type="text"
-              name="firstName"
+              name="first_name"
               onChange={handleChange}
-              value={formData.firstName}
+              value={formData.first_name}
               minLength="2"
               required
             />
           </label>
-          <label htmlFor="lastName">
+          <label htmlFor="last_name">
             Last Name
             <input
-              id="lastName"
+              id="last_name"
               type="text"
-              name="lastName"
+              name="last_name"
               onChange={handleChange}
-              value={formData.lastName}
+              value={formData.last_name}
               minLength="2"
               required
             />
           </label>
-          <label htmlFor="phone">
-            Phone Number
+          <label htmlFor="mobile_phone">
+            Mobile Phone
             <input
-              id="phone"
-              type="number"
-              name="phone"
+              id="mobile_phone"
+              type="tel"
+              name="mobile_phone"
               onChange={handleChange}
-              value={formData.phone}
+              value={formData.mobile_phone}
               required
             />
           </label>
           <label htmlFor="date">
-            Date
+            Reservation Date
             <input
-              id="date"
+              id="reservation_date"
               type="date"
-              name="date"
+              name="reservation_date"
               onChange={handleChange}
               value={formData.date}
               required
             />
           </label>
           <label htmlFor="time">
-            Time
+           Reservation Time
             <input
-              id="time"
+              id="reservation_time"
               type="time"
-              name="time"
+              name="reservation_time"
               onChange={handleChange}
               value={formData.time}
               required
             />
           </label>
-          <label htmlFor="guests">
+          <label htmlFor="people">
             Number of Guests
             <input
-              id="guests"
+              id="people"
               type="number"
-              name="guests"
+              name="people"
               onChange={handleChange}
               value={formData.guests}
               min="1"
