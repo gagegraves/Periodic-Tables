@@ -7,6 +7,11 @@ function create(reservation) {
     .then((createdRecords) => createdRecords[0]);
 }
 
+function list() {
+  return knex("reservations") 
+    .select("*");
+}
 module.exports = {
   create,
+  list,
 };

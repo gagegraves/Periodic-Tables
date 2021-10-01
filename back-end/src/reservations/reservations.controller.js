@@ -16,11 +16,10 @@ const hasRequiredProperties = hasProperties(VALID_PROPERTIES);
 function hasOnlyValidProperties(req, res, next) {
   const { data = {} } = req.body;
 
-  const invalidFields = Object.keys(data).filter(
-    (field) => !VALID_PROPERTIES.includes(field)
-  );
-
-  if (invalidFields.length) {
+  const invalidFields = Object.keys(data).filter((field) => !VALID_PROPERTIES.includes(field));
+  
+  if (invalidFields.length > 0) {
+    console.log("rejection in reservations.controller.hasOnlyValidProperties()")
     return next({
       status: 400,
       message: `Invalid field(s): ${invalidFields.join(", ")}`,
@@ -30,7 +29,8 @@ function hasOnlyValidProperties(req, res, next) {
 }
 
 async function list(req, res) {
-  res.json({ data: [] });
+  const data = await service.list();
+  res.json({ data });
 }
 
 async function create(req, res) {

@@ -1,44 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
+import {createReservation} from "../utils/api"
 
 export default function NewReservationForm() {
   const history = useHistory();
+
   const initialFormState = {
     first_name: "",
     last_name: "",
-    mobile_phone: "",
+    mobile_number: "",
+    people: "",
     reservation_date: "",
     reservation_time: "",
-    people: "",
   };
 
   const [formData, setFormData] = useState({ ...initialFormState });
-
-  
 
   const handleChange = ({ target }) => {
     setFormData({ ...formData, [target.name]: target.value });
   };
 
- async function handleSubmit(event) {
+  function handleSubmit(event) {
     event.preventDefault();
-    
+    const abortController = new AbortController();
+
+    createReservation(formData, abortController.signal);
     setFormData({ ...initialFormState });
     history.push(`/dashboard?date=${formData.reservation_date}`)
   };
-
-  //   const submitHandler = async (event) => {
-  //     event.preventDefault();
-  //     const response = await fetch(
-  //       `https://jsonplaceholder.typicode.com/users/${user.id}`,
-  //       {
-  //         method: "PUT",
-  //         body: JSON.stringify(user),
-  //       }
-  //     );
-  //     const savedData = await response.json();
-  //     console.log("Saved user!", savedData);
-  //   };
 
   return (
     <>
@@ -68,18 +57,18 @@ export default function NewReservationForm() {
               required
             />
           </label>
-          <label htmlFor="mobile_phone">
+          <label htmlFor="mobile_number">
             Mobile Phone
             <input
-              id="mobile_phone"
-              type="tel"
-              name="mobile_phone"
+              id="mobile_number"
+              type="number"
+              name="mobile_number"
               onChange={handleChange}
-              value={formData.mobile_phone}
+              value={formData.mobile_number}
               required
             />
           </label>
-          <label htmlFor="date">
+          <label htmlFor="reservation_date">
             Reservation Date
             <input
               id="reservation_date"
@@ -90,7 +79,7 @@ export default function NewReservationForm() {
               required
             />
           </label>
-          <label htmlFor="time">
+          <label htmlFor="reservation_time">
            Reservation Time
             <input
               id="reservation_time"
@@ -114,7 +103,7 @@ export default function NewReservationForm() {
             />
           </label>
           <br />
-          <button type="submit" onClick={() => history.push("/dashboard")}>Submit</button>
+          <button type="submit" onClick={(event)=>handleSubmit(event)}>Submit</button>
           <button type="button" onClick={() => history.goBack()}>
             Cancel
           </button>
