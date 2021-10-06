@@ -3,6 +3,7 @@ import { useHistory  } from "react-router-dom";
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { previous, today, next } from "../utils/date-time";
+import ReservationsTable from "./ReservationsTable"
 
 /**
  * Defines the dashboard page.
@@ -33,7 +34,7 @@ function Dashboard({ date }) {
 
 // this return statement already has a component that will show errors if something goes wrong. then, it stringifies the response from the API.
 // right now, the stringify will still output some javascript-looking strings. 
-//! format string later!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   return (
     <main>
       <h1>Dashboard</h1>
@@ -42,9 +43,8 @@ function Dashboard({ date }) {
       </div>
 
       <ErrorAlert error={reservationsError} />
-
-      {JSON.stringify(reservations)}
-
+      <ReservationsTable reservations={reservations} />
+  
       <button type="button" onClick={() => history.push(`/dashboard?date=${previous(date)}`)}>Previous</button>
 			<button type="button" onClick={() => history.push(`/dashboard?date=${today()}`)}>Today</button>
 			<button type="button" onClick={() => history.push(`/dashboard?date=${next(date)}`)}>Next</button>

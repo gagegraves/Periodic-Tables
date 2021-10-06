@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import {createReservation} from "../utils/api"
+import { createReservation } from "../utils/api";
+import ErrorAlert from "../layout/ErrorAlert";
 
 export default function NewReservationForm() {
   const history = useHistory();
@@ -15,22 +16,58 @@ export default function NewReservationForm() {
   };
 
   const [formData, setFormData] = useState({ ...initialFormState });
+  const [submissionErrors, setSubmissionErrors] = useState([]);
+  const [apiError, setApiError] = useState(null)
 
   const handleChange = ({ target }) => {
     setFormData({ ...formData, [target.name]: target.value });
   };
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const abortController = new AbortController();
+    const foundErrors = [];
 
-    createReservation(formData, abortController.signal);
-    setFormData({ ...initialFormState });
-    history.push(`/dashboard?date=${formData.reservation_date}`)
-  };
+    if (!validateDate(foundErrors)) {
+      await createReservation(formData, abortController.signal)
+        .then(() =>
+          history.push(`/dashboard?date=${formData.reservation_date}`)
+        )
+        .catch(setApiError);
+    }
+    setSubmissionErrors(foundErrors)
+    return () => abortController.abort();
+  }
+
+  function validateDate(foundErrors) {
+    const reserveDate = new Date(
+      `${formData.reservation_date}T${formData.reservation_time}:00.000`
+    );
+    const today = new Date();
+
+    if (reserveDate.getDay() === 2) {
+      foundErrors.push({
+        message:
+          "Reservation cannot be made: Restaurant is closed on Tuesdays.",
+      });
+    }
+    if (reserveDate < today) {
+      foundErrors.push({
+        message:
+          "Reservation cannot be made: Reservations cannot be set for past dates.",
+      });
+    }
+    return foundErrors.length !== 0;
+  }
+
+  const errorsJSX = () => {
+		return submissionErrors.map((error, index) => <ErrorAlert key={index} error={error} />);
+	};
 
   return (
     <>
+      {errorsJSX()}
+      <ErrorAlert error={apiError} />
       <div>
         <form onSubmit={handleSubmit}>
           <label htmlFor="first_name">
@@ -58,7 +95,7 @@ export default function NewReservationForm() {
             />
           </label>
           <label htmlFor="mobile_number">
-            Mobile Phone
+            Mobile Number
             <input
               id="mobile_number"
               type="number"
@@ -80,7 +117,7 @@ export default function NewReservationForm() {
             />
           </label>
           <label htmlFor="reservation_time">
-           Reservation Time
+            Reservation Time
             <input
               id="reservation_time"
               type="time"
@@ -103,7 +140,9 @@ export default function NewReservationForm() {
             />
           </label>
           <br />
-          <button type="submit" onClick={(event)=>handleSubmit(event)}>Submit</button>
+          <button type="submit" onClick={(event) => handleSubmit(event)}>
+            Submit
+          </button>
           <button type="button" onClick={() => history.goBack()}>
             Cancel
           </button>
