@@ -28,14 +28,14 @@ export default function NewReservationForm() {
     const abortController = new AbortController();
     const foundErrors = [];
 
-    if (!validateDate(foundErrors)) {
+    // if (!validateDate(foundErrors) && validateFields(foundErrors)) {
       //API call here
       await createReservation(formData, abortController.signal)
         .then(() =>
           history.push(`/dashboard?date=${formData.reservation_date}`)
         )
         .catch(setApiError);
-    }
+    // }
     setSubmissionErrors(foundErrors);
     return () => abortController.abort();
   }
@@ -59,7 +59,7 @@ export default function NewReservationForm() {
     if (reserveDate < today) {
       foundErrors.push({
         message:
-          "Reservation cannot be made: Reservations cannot be set for past dates.",
+          "Reservation cannot be made: Reservations must be set for a future date.",
       });
     }
       if (hours < 10 || (hours === 10 && mins < 30)) {
@@ -78,6 +78,23 @@ export default function NewReservationForm() {
             "Reservation cannot be made: Reservation must be made at least an hour before closing. (10:30PM).",
         });
       }
+    return foundErrors.length !== 0;
+  }
+
+  function validateFields(foundErrors) {
+    for(const field in formData) {
+      if(formData[field] === "") {
+        foundErrors.push({ message: `Reservation cannot be made: ${field.split("_").join(" ")} cannot be left blank.`})
+      }
+    }
+  
+    if(formData.people <= 0) {
+      foundErrors.push({ message: "Reservation cannot be made: Must have at least 1 guest." })
+    }
+  
+    if(foundErrors.length > 0) {
+      return false;
+    }
     return foundErrors.length !== 0;
   }
 

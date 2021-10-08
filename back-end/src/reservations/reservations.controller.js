@@ -34,26 +34,98 @@ function hasOnlyValidProperties(req, res, next) {
 
 function dataValidation(req, res, next) {
   const data = req.body.data;
-  if (data.first_name.length > 20 || data.first_name < 2)
+
+  for (const field in data) {
+    if (data[field] === "") {
+      return next({
+        status: 400,
+        message: `Reservation cannot be made: ${field
+          .split("_")
+          .join(" ")} cannot be left blank.`,
+      });
+    }
+  }
+
+  const reserveDate = new Date(
+    `${data.reservation_date}T${data.reservation_time}:00.000`
+  );
+  const today = new Date();
+  const hours = reserveDate.getHours();
+  const mins = reserveDate.getMinutes();
+
+  if (reserveDate.getDay() === 2) {
     return next({
       status: 400,
-      message: "First name must be between 2 and 20 characters.",
+      message: "Reservation cannot be made: Restaurant is closed on Tuesdays.",
     });
-  if (data.last_name.length > 20 || data.last_name < 2)
+  }
+
+  if (reserveDate < today) {
     return next({
       status: 400,
-      message: "Last name must be between 2 and 20 characters.",
+      message:
+        "Reservation cannot be made: Reservations must be set for a future date.",
     });
-    if (data.mobile_number.length < 9)
+  }
+
+  if (hours < 10 || (hours === 10 && mins < 30)) {
+    return next({
+      status: 400,
+      message:
+        "Reservation cannot be made: Restaurant is not open until 10:30AM.",
+    });
+  } else if (hours > 22 || (hours === 22 && mins >= 30)) {
+    return next({
+      status: 400,
+      message:
+        "Reservation cannot be made: Restaurant is closed after 10:30PM.",
+    });
+  } else if (hours > 21 || (hours === 21 && mins > 30)) {
+    return next({
+      status: 400,
+      message:
+        "Reservation cannot be made: Reservation must be made at least an hour before closing. (10:30PM).",
+    });
+  }
+
+  if (!Date.parse(reserveDate)) {
+    return next({
+      status: 400,
+      message:
+        "Reservation cannot be made: Invalid reservation_date/reservation_time.",
+    });
+  }
+
+  if (data.first_name.length > 20 || data.first_name < 2) {
+    return next({
+      status: 400,
+      message:
+        "Reservation cannot be made: First name must be between 2 and 20 characters.",
+    });
+  }
+
+  if (data.last_name.length > 20 || data.last_name < 2) {
+    return next({
+      status: 400,
+      message:
+        "Reservation cannot be made: Last name must be between 2 and 20 characters.",
+    });
+  }
+
+  if (data.mobile_number.length < 9) {
     return next({
       status: 400,
       message: "Please enter a valid mobile number.",
     });
-    if (data.people <= 0)
+  }
+
+  if (data.people <= 0 || typeof data.people !== "number") {
     return next({
       status: 400,
-      message: "There must be at least 1 person attending a reserved table.",
+      message: "Reservation cannot be made: Must have at least 1 people.",
     });
+  }
+
   next();
 }
 
