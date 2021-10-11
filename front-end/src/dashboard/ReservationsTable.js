@@ -4,6 +4,7 @@ export default function reservationsTable({ reservations }) {
   const rows = reservations.map(
     (
       {
+        reservation_id,
         first_name,
         last_name,
         mobile_number,
@@ -13,19 +14,25 @@ export default function reservationsTable({ reservations }) {
       },
       index
     ) => (
-      <tr key={index}>
+      <tr key={reservation_id}>
         <td>{first_name}</td>
         <td>{last_name}</td>
         <td>{mobile_number}</td>
         <td>{people}</td>
         <td>{reservation_date}</td>
         <td>{reservation_time}</td>
+        <td>
+				<a href={`/reservations/${reservation_id}/seat`}>
+					<button type="button">Seat</button>
+				</a>
+			</td>
+
       </tr>
     )
   );
 
   return (
-    <table class="table">
+    <table className="table">
       <thead>
         <tr>
           <th scope="col">First Name</th>

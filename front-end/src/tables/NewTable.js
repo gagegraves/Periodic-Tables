@@ -5,7 +5,7 @@ import ErrorAlert from "../layout/ErrorAlert"
 export default function NewTable() {
 	const history = useHistory();
 
-	const [error, setError] = useState([]);
+	const [error, setError] = useState(null);
 	const [formData, setFormData] = useState({
 		// initial (default) data
 		table_name: "",

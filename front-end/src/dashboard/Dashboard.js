@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useHistory } from "react-router-dom";
-import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { previous, today, next } from "../utils/date-time";
 import ReservationsTable from "./ReservationsTable";
@@ -12,32 +11,9 @@ import TablesTable from "./TablesTable";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date }) {
+function Dashboard({ date, reservations, reservationsError, tables, tablesError }) {
   const history = useHistory();
-  //reservations and tables holdsresponses from API
-  const [reservations, setReservations] = useState([]);
-  const [reservationsError, setReservationsError] = useState(null);
-  const [tables, setTables] = useState([]);
-  const [tablesError, setTablesError] = useState(null);
-
-  //useEffect will call the loadDashboard function every time the 'date' variable changes
-  useEffect(loadDashboard, [date]);
-
-  function loadDashboard() {
-    //abort controller used to avoid race conditions in async calls
-    const abortController = new AbortController();
-    setReservationsError(null);
-    // the first parameter { date } is the search parameter for the database, and also the value of 'date'
-    listReservations({ date }, abortController.signal)
-      .then(setReservations)
-      .catch(setReservationsError);
-    // here's where all other abortControllers will dump their async calls
-    return () => abortController.abort();
-  }
-
-  // this return statement already has a component that will show errors if something goes wrong. then, it stringifies the response from the API.
-  // right now, the stringify will still output some javascript-looking strings.
-
+  
   return (
     <main>
       <h1>Dashboard</h1>
@@ -48,7 +24,7 @@ function Dashboard({ date }) {
       <ErrorAlert error={reservationsError} />
       <ReservationsTable reservations={reservations} />
 
-      <h4 classname="mb-0">Tables</h4>
+      <h4 className="mb-0">Tables</h4>
       <ErrorAlert error={tablesError} />
       <TablesTable tables={tables}/>
 
