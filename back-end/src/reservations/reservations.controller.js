@@ -56,7 +56,7 @@ function dataValidation(req, res, next) {
   if (reserveDate.getDay() === 2) {
     return next({
       status: 400,
-      message: "Reservation cannot be made: Restaurant is closed on Tuesdays.",
+      message: "Reservation cannot be made: Restaurant is closed on Tuesdays",
     });
   }
 
@@ -64,7 +64,7 @@ function dataValidation(req, res, next) {
     return next({
       status: 400,
       message:
-        "Reservation cannot be made: Reservations must be set for a future date.",
+        "Reservation cannot be made: Reservations must be set for a future date",
     });
   }
 
@@ -72,19 +72,19 @@ function dataValidation(req, res, next) {
     return next({
       status: 400,
       message:
-        "Reservation cannot be made: Restaurant is not open until 10:30AM.",
+        "Reservation cannot be made: Restaurant is not open until 10:30AM",
     });
   } else if (hours > 22 || (hours === 22 && mins >= 30)) {
     return next({
       status: 400,
       message:
-        "Reservation cannot be made: Restaurant is closed after 10:30PM.",
+        "Reservation cannot be made: Restaurant is closed after 10:30PM",
     });
   } else if (hours > 21 || (hours === 21 && mins > 30)) {
     return next({
       status: 400,
       message:
-        "Reservation cannot be made: Reservation must be made at least an hour before closing. (10:30PM).",
+        "Reservation cannot be made: Reservation must be made at least an hour before closing time (10:30PM)",
     });
   }
 
@@ -92,37 +92,21 @@ function dataValidation(req, res, next) {
     return next({
       status: 400,
       message:
-        "Reservation cannot be made: Invalid reservation_date/reservation_time.",
+        "Reservation cannot be made: Invalid reservation_date/reservation_time",
     });
   }
 
-  if (data.first_name.length > 20 || data.first_name < 2) {
+  if (typeof data.people !== "number") {
     return next({
       status: 400,
-      message:
-        "Reservation cannot be made: First name must be between 2 and 20 characters.",
+      message: "Reservation cannot be made: 'people' field must be a number",
     });
   }
 
-  if (data.last_name.length > 20 || data.last_name < 2) {
+  if (data.people <= 0) {
     return next({
       status: 400,
-      message:
-        "Reservation cannot be made: Last name must be between 2 and 20 characters.",
-    });
-  }
-
-  if (data.mobile_number.length < 9) {
-    return next({
-      status: 400,
-      message: "Please enter a valid mobile number.",
-    });
-  }
-
-  if (data.people <= 0 || typeof data.people !== "number") {
-    return next({
-      status: 400,
-      message: "Reservation cannot be made: Must have at least 1 people.",
+      message: "Reservation cannot be made: 'people' field must be at least 1",
     });
   }
 

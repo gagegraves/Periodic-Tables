@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useHistory  } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import { previous, today, next } from "../utils/date-time";
-import ReservationsTable from "./ReservationsTable"
+import ReservationsTable from "./ReservationsTable";
+import TablesTable from "./TablesTable";
 
 /**
  * Defines the dashboard page.
@@ -13,9 +14,11 @@ import ReservationsTable from "./ReservationsTable"
  */
 function Dashboard({ date }) {
   const history = useHistory();
-  //reservations holds response from API
+  //reservations and tables holdsresponses from API
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
+  const [tables, setTables] = useState([]);
+  const [tablesError, setTablesError] = useState(null);
 
   //useEffect will call the loadDashboard function every time the 'date' variable changes
   useEffect(loadDashboard, [date]);
@@ -28,12 +31,12 @@ function Dashboard({ date }) {
     listReservations({ date }, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
-      // here's where all other abortControllers will dump their async calls
+    // here's where all other abortControllers will dump their async calls
     return () => abortController.abort();
   }
 
-// this return statement already has a component that will show errors if something goes wrong. then, it stringifies the response from the API.
-// right now, the stringify will still output some javascript-looking strings. 
+  // this return statement already has a component that will show errors if something goes wrong. then, it stringifies the response from the API.
+  // right now, the stringify will still output some javascript-looking strings.
 
   return (
     <main>
@@ -44,10 +47,29 @@ function Dashboard({ date }) {
 
       <ErrorAlert error={reservationsError} />
       <ReservationsTable reservations={reservations} />
-  
-      <button type="button" onClick={() => history.push(`/dashboard?date=${previous(date)}`)}>Previous</button>
-			<button type="button" onClick={() => history.push(`/dashboard?date=${today()}`)}>Today</button>
-			<button type="button" onClick={() => history.push(`/dashboard?date=${next(date)}`)}>Next</button>
+
+      <h4 classname="mb-0">Tables</h4>
+      <ErrorAlert error={tablesError} />
+      <TablesTable tables={tables}/>
+
+      <button
+        type="button"
+        onClick={() => history.push(`/dashboard?date=${previous(date)}`)}
+      >
+        Previous
+      </button>
+      <button
+        type="button"
+        onClick={() => history.push(`/dashboard?date=${today()}`)}
+      >
+        Today
+      </button>
+      <button
+        type="button"
+        onClick={() => history.push(`/dashboard?date=${next(date)}`)}
+      >
+        Next
+      </button>
     </main>
   );
 }

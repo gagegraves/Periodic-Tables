@@ -5,6 +5,7 @@ import Dashboard from "../dashboard/Dashboard";
 import NotFound from "./NotFound";
 import { today } from "../utils/date-time";
 import NewReservationForm from "../reservations/NewReservationForm";
+import NewTable from "../tables/NewTable"
 import useQuery from "../utils/useQuery";
 
 /**
@@ -16,12 +17,15 @@ import useQuery from "../utils/useQuery";
  */
 function Routes() {
   const query = useQuery();
-	const date = query.get("date");
+  const date = query.get("date");
 
   return (
     <Switch>
       <Route exact={true} path="/reservations/new">
         <NewReservationForm />
+      </Route>
+      <Route exact={true} path="/tables/new">
+        <NewTable />
       </Route>
       <Route path="/dashboard">
         <Dashboard date={date ? date : today()} />

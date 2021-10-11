@@ -19,33 +19,36 @@ export default function NewReservationForm() {
   const [submissionErrors, setSubmissionErrors] = useState([]);
   const [apiError, setApiError] = useState(null);
 
-  const handleChange = ({ target }) => {
-    setFormData({ ...formData, [target.name]: target.value });
-  };
+  function handleChange({ target }) {
+		setFormData({ ...formData, [target.name]: target.name === "people" ? Number(target.value) : target.value });
+	}
+
   //makes the API call to create the reservation in the database once the form is submitted
   async function handleSubmit(event) {
     event.preventDefault();
     const abortController = new AbortController();
     const foundErrors = [];
 
-    // if (!validateDate(foundErrors) && validateFields(foundErrors)) {
-      //API call here
+    if (!validateDate(foundErrors) && !validateFields(foundErrors)) {
+      
+      //* API call here
       await createReservation(formData, abortController.signal)
         .then(() =>
           history.push(`/dashboard?date=${formData.reservation_date}`)
         )
         .catch(setApiError);
-    // }
+    }
     setSubmissionErrors(foundErrors);
     return () => abortController.abort();
   }
+
   //the validation function to ensure that the date and time being set for the reservation are during the restaurants open hours
   function validateDate(foundErrors) {
     //a string that is a full JS-formatted date/time
     const reserveDate = new Date(
       `${formData.reservation_date}T${formData.reservation_time}:00.000`
     );
-      //grab todays date, and the 
+      //grab todays date, and the hours/mniutes of the submitted reservation time for reference/validation
     const today = new Date();
     const hours = reserveDate.getHours();  
     const mins = reserveDate.getMinutes();
@@ -138,7 +141,7 @@ export default function NewReservationForm() {
             Mobile Number
             <input
               id="mobile_number"
-              type="number"
+              type="tel"
               name="mobile_number"
               onChange={handleChange}
               value={formData.mobile_number}
