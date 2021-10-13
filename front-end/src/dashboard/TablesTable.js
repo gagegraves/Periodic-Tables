@@ -1,5 +1,5 @@
 export default function tablesTables({ tables }) {
-  if (!tables) return null;
+  if (!tables || tables.length < 1) return null;
 
   const rows = tables.map(({ table_id, table_name, capacity, status }, index) => (
     <tr key={table_id}>

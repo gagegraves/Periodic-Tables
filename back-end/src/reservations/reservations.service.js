@@ -15,7 +15,15 @@ function list(reservation_date) {
     .where({ reservation_date });
 }
 
+function read(reservation_id) {
+  return knex("reservations")
+    .select("*")
+    .where({ reservation_id: reservation_id })
+    .first()
+}
+
 module.exports = {
   create,
   list,
+  read,
 };

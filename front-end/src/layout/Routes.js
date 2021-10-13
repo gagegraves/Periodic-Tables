@@ -16,12 +16,15 @@ import { listReservations, listTables } from "../utils/api";
  *
  * @returns {JSX.Element}
  */
+
 function Routes() {
   const query = useQuery();
   const date = query.get("date");
 
+  //these values will be defined by an API call and passed down as props to all the components that require them
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
+
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
 
@@ -32,12 +35,15 @@ function Routes() {
     //abort controller used to avoid race conditions in async calls
     const abortController = new AbortController();
     setReservationsError(null);
+    setTablesError(null);
+
     // the first parameter { date } is the search parameter for the database, and also the value of 'date'
     listReservations({ date }, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
 
     listTables(abortController.signal).then(setTables).catch(setTablesError);
+
     // here's where all other abortControllers will dump their async calls
     return () => abortController.abort();
   }
@@ -47,14 +53,15 @@ function Routes() {
       <Route exact={true} path="/reservations/new">
         <NewReservationForm />
       </Route>
-      //?-------------
-  //TODO: set up set reservation component!!!
-      //?-----------
+
       <Route exact={true} path="/reservations/:reservation_id/seat">
-        <SeatReservation />
+        <SeatReservation
+          tables={tables}
+          loadDasboard={loadDashboard}
+        />
       </Route>
       <Route exact={true} path="/tables/new">
-        <NewTable />
+        <NewTable loadDashboard={loadDashboard} />
       </Route>
       <Route path="/dashboard">
         <Dashboard
@@ -63,6 +70,7 @@ function Routes() {
           reservationsError={reservationsError}
           tables={tables}
           tablesError={tablesError}
+          loadDashboard={loadDashboard}
         />
       </Route>
       <Route exact={true} path="/">

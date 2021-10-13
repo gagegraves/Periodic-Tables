@@ -101,7 +101,7 @@ export default function NewReservationForm() {
     return foundErrors.length !== 0;
   }
 
-  const errorsJSX = () => {
+  function errorsJSX () {
     return submissionErrors.map((error, index) => (
       <ErrorAlert key={index} error={error} />
     ));

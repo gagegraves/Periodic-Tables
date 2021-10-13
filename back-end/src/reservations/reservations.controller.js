@@ -113,10 +113,26 @@ function dataValidation(req, res, next) {
   next();
 }
 
+async function validateReservationId(req, res, next) {
+  const { reservation_id } = req.params;
+  const reservation = await service.read(Number(reservation_id));
+  if(!reservation) {
+      return next({ status: 404, message: `reservation id ${reservation_id} does not exist` });
+  }
+
+  res.locals.reservation = reservation;
+
+  next();
+}
+
 async function list(req, res) {
   let { date = null } = req.query;
   const data = await service.list(date);
   res.json({ data });
+}
+
+async function read(req, res) {
+	res.status(200).json({ data: res.locals.reservation });
 }
 
 async function create(req, res) {
@@ -126,6 +142,7 @@ async function create(req, res) {
 
 module.exports = {
   list: asyncErrorBoundary(list),
+  read: [asyncErrorBoundary(validateReservationId), asyncErrorBoundary(read)],
   create: [
     asyncErrorBoundary(hasOnlyValidProperties),
     asyncErrorBoundary(hasRequiredProperties),
