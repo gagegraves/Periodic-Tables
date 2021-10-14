@@ -85,6 +85,13 @@ async function validateBody(req, res, next) {
 }
 
 async function validateSeat(req, res, next) {
+  if (res.locals.reservation.status === "seated") {
+    return next({
+      status: 400,
+      message: "this reservation is already seated to a table",
+    });
+  }
+
   if (res.locals.table.status === "occupied") {
     return next({
       status: 400,
