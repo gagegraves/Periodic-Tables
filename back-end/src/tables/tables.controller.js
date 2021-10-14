@@ -102,8 +102,19 @@ async function validateSeat(req, res, next) {
   next();
 }
 
+async function validateOccupiedTable(req, res, next) {
+  if (res.locals.table.status !== "occupied") {
+    return next({
+      status: 400,
+      message: "Selected table is not occupied.",
+    });
+  }
+  
+  next();
+}
+
 async function update(req, res) {
-  await service.occupy(
+  await service.occupyTable(
     res.locals.table.table_id,
     res.locals.reservation.reservation_id
   );
@@ -115,7 +126,7 @@ async function update(req, res) {
   res.status(200).json({ data: { status: "seated" } });
 }
 
-async function create(req, res) {
+async function createTable(req, res) {
   if (req.body.data.reservation_id) {
     req.body.data.status = "occupied";
     await service.updateReservation(req.body.data.reservation_id, "seated");
@@ -123,17 +134,24 @@ async function create(req, res) {
     req.body.data.status = "free";
   }
 
-  const response = await service.create(req.body.data);
+  const response = await service.createTable(req.body.data);
 
   res.status(201).json({ data: response[0] });
 }
 
+async function freeTable(req, res) {
+  await service.updateReservation(res.locals.table.reservation_id, "finished");
+  await service.freeTable(res.locals.table.table_id);
+
+  res.status(200).json({ data: { status: "finsished" } });
+}
+
 module.exports = {
   list: [asyncErrorBoundary(list)],
-  create: [
+  createTable: [
     asyncErrorBoundary(validateData),
     asyncErrorBoundary(validateBody),
-    asyncErrorBoundary(create),
+    asyncErrorBoundary(createTable),
   ],
   update: [
     asyncErrorBoundary(validateData),
@@ -141,5 +159,10 @@ module.exports = {
     asyncErrorBoundary(validateReservationId),
     asyncErrorBoundary(validateSeat),
     asyncErrorBoundary(update),
+  ],
+  freeTable: [
+    asyncErrorBoundary(validateTableId),
+    asyncErrorBoundary(validateOccupiedTable),
+    asyncErrorBoundary(freeTable),
   ],
 };
