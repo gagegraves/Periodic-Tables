@@ -1,15 +1,30 @@
-export default function tablesTables({ tables }) {
+export default function tablesTables({ tables, loadDashbard, history }) {
   if (!tables || tables.length < 1) return null;
 
-  const rows = tables.map(({ table_id, table_name, capacity, status }, index) => (
-    <tr key={table_id}>
-      <td>{table_id}</td>
-      <td>{table_name}</td>
-      <td>{capacity}</td>
-      <td data-table-id-status={table_id}>{status}</td>
-    </tr>
-  ));
-  
+  function handleFinish() {
+    if (window.confirm("Is this table ready to seat new guests? This cannot be undone.")) {
+           history.push("/dashboard");
+    }
+  }
+
+  const rows = tables.map(
+    ({ table_id, table_name, capacity, status }, index) => (
+      <tr key={table_id}>
+        <td>{table_id}</td>
+        <td>{table_name}</td>
+        <td>{capacity}</td>
+        <td data-table-id-status={table_id}>{status}</td>
+        {status === "occupied" && (
+          <td data-table-id-finish={table_id}>
+            <button onClick={handleFinish} type="button">
+              Finish
+            </button>
+          </td>
+        )}
+      </tr>
+    )
+  );
+
   return (
     <table className="table">
       <thead>

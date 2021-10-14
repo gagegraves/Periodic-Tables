@@ -21,7 +21,7 @@ function Dashboard({ date, reservations, reservationsError, tables, tablesError 
 
       <h4 className="mb-0">Tables</h4>
       <ErrorAlert error={tablesError} />
-      <TablesTable tables={tables}/>
+      <TablesTable tables={tables} loadDashboard={loadDashboard} history={history}/>
 
       <button type="button" onClick={() => history.push(`/dashboard?date=${previous(date)}`)}>Previous</button>
       <button type="button" onClick={() => history.push(`/dashboard?date=${today()}`)}>Today</button>
