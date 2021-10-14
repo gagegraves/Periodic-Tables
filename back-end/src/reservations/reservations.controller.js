@@ -7,7 +7,6 @@ async function validateDataExists(req, res, next) {
     return next({ status: 400, message: "Body must include a data object" });
   }
 
-  console.log("validate data - pass")
   next();
 }
 
@@ -52,7 +51,6 @@ function validateRequiredProperties(req, res, next) {
       message: `'status' field cannot be ${reservation.status}`,
     });
   }
-  console.log("validate required properties - pass")
 
   next();
 }
@@ -124,7 +122,6 @@ function validateReservationDate(req, res, next) {
     });
   }
 
-  console.log("validate date - pass")
   next();
 }
 
