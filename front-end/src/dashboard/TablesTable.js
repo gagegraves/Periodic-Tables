@@ -1,9 +1,15 @@
-export default function tablesTables({ tables, loadDashbard, history }) {
+import { freeTable } from "../utils/api";
+
+export default function TablesTables({ tables, loadDashboard }) {
   if (!tables || tables.length < 1) return null;
 
-  function handleFinish() {
+   async function handleFinish({ target }) {
     if (window.confirm("Is this table ready to seat new guests? This cannot be undone.")) {
-           history.push("/dashboard");
+      const abortController = new AbortController();
+
+      await freeTable(target.value, abortController.signal).then(loadDashboard);
+
+      return () => abortController.abort(); 
     }
   }
 
@@ -15,8 +21,13 @@ export default function tablesTables({ tables, loadDashbard, history }) {
         <td>{capacity}</td>
         <td data-table-id-status={table_id}>{status}</td>
         {status === "occupied" && (
-          <td data-table-id-finish={table_id}>
-            <button onClick={handleFinish} type="button">
+          <td>
+            <button 
+              data-table-id-finish={table_id}
+              value ={table_id}
+              onClick={handleFinish} 
+              type="button"
+              >
               Finish
             </button>
           </td>

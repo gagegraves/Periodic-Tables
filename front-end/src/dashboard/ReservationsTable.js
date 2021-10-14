@@ -1,4 +1,4 @@
-export default function reservationsTable({ reservations }) {
+export default function ReservationsTable({ reservations }) {
   if (!reservations || reservations.length < 1) return null;
 
   const rows = reservations.map(

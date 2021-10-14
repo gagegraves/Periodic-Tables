@@ -99,3 +99,11 @@ export async function createTable(table, signal) {
 
   return await fetchJson(url, { headers, signal, method: "POST", body }, []);
 }
+
+export async function freeTable(table_id, signal) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+
+  const body = JSON.stringify({ data: table_id });
+
+  return await fetchJson(url, {headers, signal, method: "DELETE", body}, []);
+}
