@@ -43,6 +43,11 @@ export default function NewTable({ loadDashboard }) {
       foundError = { message: "Table name must be at least 2 characters." };
     }
 
+	if(formData.capacity < 1) {
+		console.log("Capacity on submission: ", formData.capacity)
+		foundError = { message: "Capacity cannot be less than 1."}
+	}
+
     setError(foundError);
 
     return foundError !== null;
@@ -57,7 +62,6 @@ export default function NewTable({ loadDashboard }) {
         name="table_name"
         id="table_name"
         type="text"
-        minLength="2"
         onChange={handleChange}
         value={formData.table_name}
         required

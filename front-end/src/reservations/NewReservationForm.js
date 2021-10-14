@@ -29,7 +29,7 @@ export default function NewReservationForm() {
     const abortController = new AbortController();
     const foundErrors = [];
 
-    if (!validateDate(foundErrors) && !validateFields(foundErrors)) {
+    if (validateDate(foundErrors) && validateFields(foundErrors)) {
       
       //* API call here
       await createReservation(formData, abortController.signal)
@@ -81,7 +81,7 @@ export default function NewReservationForm() {
             "Reservation cannot be made: Reservation must be made at least an hour before closing. (10:30PM).",
         });
       }
-    return foundErrors.length !== 0;
+    return foundErrors.length === 0;
   }
 
   function validateFields(foundErrors) {
@@ -95,10 +95,7 @@ export default function NewReservationForm() {
       foundErrors.push({ message: "Reservation cannot be made: Must have at least 1 guest." })
     }
   
-    if(foundErrors.length > 0) {
-      return false;
-    }
-    return foundErrors.length !== 0;
+    return foundErrors.length === 0;
   }
 
   function errorsJSX () {

@@ -21,58 +21,62 @@ export default function SeatReservation({ tables, loadDashboard }) {
 
     listReservations(null, abortController.abort())
       .then(setReservations)
-      .catch(setReservationsError);
+      .catch((error) => console.log(error));
 
     return () => abortController.abort();
   }, []);
 
+  //if there are either no tables or no reservations returned by the API, return null
   if (!tables || !reservations) return null;
 
   function handleChange({ target }) {
     setTableId(target.value);
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const abortController = new AbortController();
+    const foundErrors = [];
 
-    if (validateSeat()) {
-      seatTable(reservation_id, table_id, abortController.signal)
-	  	.then(loadDashboard)
+    if (validateSeat(foundErrors)) {
+
+      await seatTable(reservation_id, table_id, abortController.signal)
+        .then(loadDashboard)
         .then(() => history.push(`/dashboard`))
         .catch(setApiErrors);
     }
-
+    setErrors(foundErrors);
     return () => abortController.abort();
   }
 
-  function validateSeat() {
-    const foundErrors = [];
-
+  function validateSeat(foundErrors) {
     // we will need to use the find method here to get the actual table/reservation objects from their ids
-    const foundTable = tables.find((table) => table.table_id === table_id);
+
+    const foundTable = tables.find(
+      (table) => table.table_id === Number(table_id)
+    );
+
     const foundReservation = reservations.find(
-      (reservation) => reservation.reservation_id === reservation_id
+      (reservation) => reservation.reservation_id === Number(reservation_id)
     );
 
     if (!foundTable) {
       foundErrors.push("The table you selected does not exist.");
-    } else if (!foundReservation) {
-      foundErrors.push("This reservation does not exist.");
-    } else {
+    }
+    else if (!foundReservation) {
+      foundErrors.push({message: "This reservation does not exist."});
+    }
+    else {
       if (foundTable.status === "occupied") {
-        foundErrors.push("The table you selected is currently occupied.");
+        foundErrors.push({message: "The table you selected is currently occupied."});
       }
 
       if (foundTable.capacity < foundReservation.people) {
-        foundErrors.push(
-          `The table you selected cannot seat ${foundReservation.people} people.`
-        );
+        foundErrors.push({
+          message: `The table you selected cannot seat ${foundReservation.people} people.`,
+        });
       }
     }
-
-    setErrors(foundErrors);
-
     // this conditional will either return true or false based off of whether foundErrors is equal to 0
     return foundErrors.length === 0;
   }
@@ -80,7 +84,7 @@ export default function SeatReservation({ tables, loadDashboard }) {
   //function that takes the table data from the API and formats it for the table selector in the seat reservations page
   function tablesOptions() {
     return tables.map((table, index) => (
-      <option key={index} value={table.table_id}>
+      <option key={table.table_id} value={table.table_id}>
         {table.table_name} - {table.capacity}
       </option>
     ));
@@ -93,10 +97,11 @@ export default function SeatReservation({ tables, loadDashboard }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="form-select">
       {errorsJSX()}
       <ErrorAlert error={reservationsError} />
       <ErrorAlert error={apiErrors} />
+
       <label htnlfor="table_id">Choose Table</label>
       <select
         name="table_id"
@@ -104,6 +109,7 @@ export default function SeatReservation({ tables, loadDashboard }) {
         value={table_id}
         onChange={handleChange}
       >
+        <option value={0}>Choose a Table</option>
         {tablesOptions()}
       </select>
       <button type="submit" onClick={(event) => handleSubmit(event)}>
