@@ -8,7 +8,7 @@ import TablesTable from "./TablesTable";
 //defines the dashboard page
 function Dashboard({ date, reservations, reservationsError, tables, tablesError , loadDashboard}) {
   const history = useHistory();
-
+  
   return (
     <main>
       <h1>Dashboard</h1>
@@ -31,3 +31,4 @@ function Dashboard({ date, reservations, reservationsError, tables, tablesError 
 }
 
 export default Dashboard;
+

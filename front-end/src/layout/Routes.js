@@ -19,7 +19,7 @@ import { listReservations, listTables } from "../utils/api";
 
 function Routes() {
   const query = useQuery();
-  const date = query.get("date");
+  const date = query.get("date") ? query.get("date") : today();
 
   //these values will be defined by an API call and passed down as props to all the components that require them
   const [reservations, setReservations] = useState([]);
@@ -33,9 +33,11 @@ function Routes() {
 
   function loadDashboard() {
     //abort controller used to avoid race conditions in async calls
-    const abortController = new AbortController();
+    setReservations([]);
+    setTables([]);
     setReservationsError(null);
     setTablesError(null);
+    const abortController = new AbortController();
 
     // the first parameter { date } is the search parameter for the database, and also the value of 'date'
     listReservations({ date }, abortController.signal)

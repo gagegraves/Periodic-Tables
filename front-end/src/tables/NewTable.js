@@ -8,10 +8,10 @@ export default function NewTable({ loadDashboard }) {
 
   const [error, setError] = useState(null);
 
-  // initial (default) data
+  // initial empty form state
   const [formData, setFormData] = useState({
     table_name: "",
-    capacity: 1,
+    capacity: "",
   });
 
   //updates form data as the user types into the form
@@ -57,7 +57,7 @@ export default function NewTable({ loadDashboard }) {
     <form>
       <ErrorAlert error={error} />
 
-      <label htmlFor="table_name">Table Name:&nbsp;</label>
+      <label htmlFor="table_name">Table Name:</label>
       <input
         name="table_name"
         id="table_name"
@@ -67,14 +67,14 @@ export default function NewTable({ loadDashboard }) {
         required
       />
 
-      <label htmlFor="capacity">Capacity:&nbsp;</label>
+      <label htmlFor="capacity">Capacity:</label>
       <input
-        name="capacity"
         id="capacity"
         type="number"
-        min="1"
+        name="capacity"
         onChange={handleChange}
         value={formData.capacity}
+        min="1"
         required
       />
 

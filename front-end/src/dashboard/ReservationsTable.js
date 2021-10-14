@@ -11,6 +11,7 @@ export default function reservationsTable({ reservations }) {
         people,
         reservation_date,
         reservation_time,
+        status
       },
       index
     ) => (
@@ -21,9 +22,10 @@ export default function reservationsTable({ reservations }) {
         <td>{people}</td>
         <td>{reservation_date}</td>
         <td>{reservation_time}</td>
+        <td data-reservation-id-status={reservation_id}>{status}</td>
         <td>
 				<a href={`/reservations/${reservation_id}/seat`}>
-					<button type="button">Seat</button>
+					<button href={`/reservations/${reservation_id}/seat`} type="button">Seat</button>
 				</a>
 			</td>
 
@@ -41,6 +43,7 @@ export default function reservationsTable({ reservations }) {
           <th scope="col">People</th>
           <th scope="col">Reservation Date</th>
           <th scope="col">Reservation Time</th>
+          <th scope="col">Status</th>
         </tr>
       </thead>
       <tbody>{rows}</tbody>

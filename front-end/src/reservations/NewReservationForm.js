@@ -174,7 +174,7 @@ export default function NewReservationForm() {
               type="number"
               name="people"
               onChange={handleChange}
-              value={formData.guests}
+              value={formData.people}
               min="1"
               required
             />

@@ -13,6 +13,9 @@ export default function SeatReservation({ tables, loadDashboard }) {
   const [apiErrors, setApiErrors] = useState(null);
 
   const { reservation_id } = useParams();
+  const foundReservation = reservations.find(
+    (reservation) => reservation.reservation_id === Number(reservation_id)
+  );
 
   //make an API call to retrieve all reservations on first render
   useEffect(() => {
@@ -40,11 +43,13 @@ export default function SeatReservation({ tables, loadDashboard }) {
 
     if (validateSeat(foundErrors)) {
 
+
       await seatTable(reservation_id, table_id, abortController.signal)
         .then(loadDashboard)
-        .then(() => history.push(`/dashboard`))
+        .then(() => history.push(`/dashboard?date=${foundReservation.reservation_date}`))
         .catch(setApiErrors);
     }
+
     setErrors(foundErrors);
     return () => abortController.abort();
   }
@@ -54,10 +59,6 @@ export default function SeatReservation({ tables, loadDashboard }) {
 
     const foundTable = tables.find(
       (table) => table.table_id === Number(table_id)
-    );
-
-    const foundReservation = reservations.find(
-      (reservation) => reservation.reservation_id === Number(reservation_id)
     );
 
     if (!foundTable) {
