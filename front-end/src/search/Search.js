@@ -3,9 +3,10 @@ import { listReservations } from "../utils/api";
 import ReservationsTable from "../dashboard/ReservationsTable";
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function Search() {
+export default function Search({ handleCancel }) {
   const [mobileNumber, setMobileNumber] = useState("");
   const [reservations, setReservations] = useState([]);
+  const [renderReservationsTable, setRenderReservationsTable] = useState(false);
 
   const [error, setError] = useState(null);
 
@@ -20,6 +21,7 @@ export default function Search() {
 
 	listReservations({ mobile_number: mobileNumber }, abortController.signal)
 		.then(setReservations)
+        .then(setRenderReservationsTable(true))
 		.catch(setError);
 
 	return () => abortController.abort();
@@ -43,7 +45,9 @@ export default function Search() {
 
 			<button type="submit" onClick={handleSubmit}>Find</button>
 		</form>
-      <ReservationsTable reservations={reservations} />
+        { renderReservationsTable &&    
+      <ReservationsTable reservations={reservations} handleCancel={handleCancel} />
+        }   
     </div>
   );
 }

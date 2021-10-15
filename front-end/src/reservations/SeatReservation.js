@@ -99,11 +99,13 @@ export default function SeatReservation({ tables, loadDashboard }) {
 
   return (
     <form className="form-select">
+      
       {errorsJSX()}
       <ErrorAlert error={reservationsError} />
       <ErrorAlert error={apiErrors} />
 
       <label htnlfor="table_id">Choose Table</label>
+
       <select
         name="table_id"
         id="table_id"
@@ -113,12 +115,15 @@ export default function SeatReservation({ tables, loadDashboard }) {
         <option value={0}>Choose a Table</option>
         {tablesOptions()}
       </select>
+
       <button type="submit" onClick={(event) => handleSubmit(event)}>
         Submit
       </button>
+
       <button type="button" onClick={history.goBack}>
         Cancel
       </button>
+
     </form>
   );
 }

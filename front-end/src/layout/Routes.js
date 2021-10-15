@@ -5,6 +5,7 @@ import useQuery from "../utils/useQuery";
 import Dashboard from "../dashboard/Dashboard";
 import NewTable from "../tables/NewTable";
 import NewReservationForm from "../reservations/NewReservationForm";
+import EditReservationForm from "../reservations/EditReservationForm";
 import SeatReservation from "../reservations/SeatReservation";
 import Search from "../search/Search"
 import NotFound from "./NotFound";
@@ -51,15 +52,28 @@ function Routes() {
     return () => abortController.abort();
   }
 
+  function handleCancel() {
+    if(window.confirm("Do you want to cancel this reservation? This cannot be undone.")) {
+  
+      window.location.reload(); 
+    }
+  }
+
   return (
     <Switch>
+
       <Route exact={true} path="/reservations/:reservation_id/seat">
         <SeatReservation
           tables={tables}
           loadDasboard={loadDashboard}
+          handleCancel={handleCancel}
         />
       </Route>
       
+      <Route exact={true} path="/reservations/:reservation_id/edit">
+        <EditReservationForm reservations={reservations} loadDasboard={loadDashboard}/>
+      </Route>
+
       <Route exact={true} path="/reservations/new">
         <NewReservationForm />
       </Route>
@@ -69,7 +83,7 @@ function Routes() {
       </Route>
 
       <Route path="/search">
-        <Search reservations={reservations} />
+        <Search handleCancel={handleCancel}/>
       </Route>
 
       <Route path="/dashboard">

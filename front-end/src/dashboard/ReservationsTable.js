@@ -1,5 +1,6 @@
-export default function ReservationsTable({ reservations }) {
-  if (!reservations || reservations.length < 1) return <p>No reservations found.</p>;
+export default function ReservationsTable({ reservations, handleCancel }) {
+  if (!reservations || reservations.length < 1)
+    return <p>No reservations found.</p>;
 
   const rows = reservations.map(
     (
@@ -11,7 +12,7 @@ export default function ReservationsTable({ reservations }) {
         people,
         reservation_date,
         reservation_time,
-        status
+        status,
       },
       index
     ) => (
@@ -23,14 +24,29 @@ export default function ReservationsTable({ reservations }) {
         <td>{reservation_date}</td>
         <td>{reservation_time}</td>
         <td data-reservation-id-status={reservation_id}>{status}</td>
-        {status === "booked" &&
-				<td>
-					<a href={`/reservations/${reservation_id}/seat`}>
-						<button type="button">Seat</button>
-					</a>
-				</td>
-			}
 
+        {status === "booked" && (
+          <td>
+            <a href={`/reservations/${reservation_id}/seat`}>
+              <button type="button">Seat</button>
+            </a>
+          </td>
+        )}
+
+        <td>
+          <a href={`/reservations/${reservation_id}/edit`}>
+            <button type="button">Edit</button>
+          </a>
+        </td>
+        <td>
+          <button
+            type="button"
+            onClick={handleCancel}
+            data-reservation-id-cancel={reservation_id}
+          >
+            Cancel
+          </button>
+        </td>
       </tr>
     )
   );
@@ -46,6 +62,9 @@ export default function ReservationsTable({ reservations }) {
           <th scope="col">Reservation Date</th>
           <th scope="col">Reservation Time</th>
           <th scope="col">Status</th>
+          {/* <th scope="col">Seat</th>
+          <th scope="col">Edit</th>
+          <th scope="col">Cancel</th> */}
         </tr>
       </thead>
       <tbody>{rows}</tbody>
