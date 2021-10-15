@@ -1,7 +1,3 @@
-/**
- * Defines the base URL for the API.
- * The default values is overridden by the `API_BASE_URL` environment variable.
- */
 import formatReservationDate from "./format-reservation-date";
 import formatReservationTime from "./format-reservation-date";
 
@@ -87,7 +83,7 @@ export async function listTables(signal) {
 export async function seatTable(reservation_id, table_id, signal) {
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
 
-  const body = JSON.stringify({ data: { reservation_id: reservation_id } });
+  const body = JSON.stringify({ data: { reservation_id: reservation_id }});
 
   return await fetchJson(url, { headers, signal, method: "PUT", body }, []);
 }

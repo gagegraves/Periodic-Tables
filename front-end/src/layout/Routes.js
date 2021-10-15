@@ -6,6 +6,7 @@ import Dashboard from "../dashboard/Dashboard";
 import NewTable from "../tables/NewTable";
 import NewReservationForm from "../reservations/NewReservationForm";
 import SeatReservation from "../reservations/SeatReservation";
+import Search from "../search/Search"
 import NotFound from "./NotFound";
 import { listReservations, listTables } from "../utils/api";
 
@@ -52,19 +53,25 @@ function Routes() {
 
   return (
     <Switch>
-      <Route exact={true} path="/reservations/new">
-        <NewReservationForm />
-      </Route>
-
       <Route exact={true} path="/reservations/:reservation_id/seat">
         <SeatReservation
           tables={tables}
           loadDasboard={loadDashboard}
         />
       </Route>
+      
+      <Route exact={true} path="/reservations/new">
+        <NewReservationForm />
+      </Route>
+
       <Route exact={true} path="/tables/new">
         <NewTable loadDashboard={loadDashboard} />
       </Route>
+
+      <Route path="/search">
+        <Search reservations={reservations} />
+      </Route>
+
       <Route path="/dashboard">
         <Dashboard
           date={date ? date : today()}
@@ -75,12 +82,15 @@ function Routes() {
           loadDashboard={loadDashboard}
         />
       </Route>
+
       <Route exact={true} path="/">
         <Redirect to={"/dashboard"} />
       </Route>
+
       <Route>
         <NotFound />
       </Route>
+
     </Switch>
   );
 }

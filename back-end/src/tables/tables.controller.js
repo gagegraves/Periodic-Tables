@@ -85,17 +85,17 @@ async function validateBody(req, res, next) {
 }
 
 async function validateSeat(req, res, next) {
-  if (res.locals.reservation.status === "seated") {
-    return next({
-      status: 400,
-      message: "this reservation is already seated to a table",
-    });
-  }
-
   if (res.locals.table.status === "occupied") {
     return next({
       status: 400,
       message: "the table you selected is currently occupied",
+    });
+  }
+
+  if (res.locals.reservation.status === "seated") {
+    return next({
+      status: 400,
+      message: "this reservation is already seated to a table",
     });
   }
 
@@ -116,11 +116,11 @@ async function validateOccupiedTable(req, res, next) {
       message: "Selected table is not occupied.",
     });
   }
-  
+
   next();
 }
 
-async function update(req, res) {
+async function occupyTable(req, res) {
   await service.occupyTable(
     res.locals.table.table_id,
     res.locals.reservation.reservation_id
@@ -155,18 +155,21 @@ async function freeTable(req, res) {
 
 module.exports = {
   list: [asyncErrorBoundary(list)],
+
   createTable: [
     asyncErrorBoundary(validateData),
     asyncErrorBoundary(validateBody),
     asyncErrorBoundary(createTable),
   ],
-  update: [
+
+  occupyTable: [
     asyncErrorBoundary(validateData),
     asyncErrorBoundary(validateTableId),
     asyncErrorBoundary(validateReservationId),
     asyncErrorBoundary(validateSeat),
-    asyncErrorBoundary(update),
+    asyncErrorBoundary(occupyTable),
   ],
+
   freeTable: [
     asyncErrorBoundary(validateTableId),
     asyncErrorBoundary(validateOccupiedTable),

@@ -158,8 +158,12 @@ async function validateUpdateBody(req, res, next) {
 //return a list of all reservations from db
 async function list(req, res) {
   let { date = null } = req.query;
-  const reservations = await service.list(date);
+  let {mobile_number = null} = req.query;
+
+  const reservations = await service.list(date, mobile_number);
+
   const response = reservations.filter((res) => res.status !== "finished")
+  
   res.json({ data: response });
 }
 

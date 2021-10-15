@@ -1,5 +1,5 @@
 export default function ReservationsTable({ reservations }) {
-  if (!reservations || reservations.length < 1) return null;
+  if (!reservations || reservations.length < 1) return <p>No reservations found.</p>;
 
   const rows = reservations.map(
     (

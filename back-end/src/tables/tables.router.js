@@ -4,7 +4,7 @@ const methodNotAllowed = require("../errors/methodNotAllowed");
 
 router
   .route("/:table_id/seat")
-  .put(controller.update)
+  .put(controller.occupyTable)
   .delete(controller.freeTable)
   .all(methodNotAllowed);
 

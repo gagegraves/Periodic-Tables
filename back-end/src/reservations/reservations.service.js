@@ -7,25 +7,34 @@ function create(reservation) {
     .then((createdRecords) => createdRecords[0]);
 }
 
-function list(reservation_date) {
-  if (!reservation_date) return knex("reservations").select("*");
-  return knex("reservations")
-    .select("*")
-    .orderBy("reservation_time")
-    .where({ reservation_date });
+function list(date, mobile_number) {
+  if (date) {
+    return knex("reservations")
+      .select("*")
+      .where({ reservation_date: date })
+      .orderBy("reservation_time");
+  }
+
+  if (mobile_number) {
+    return knex("reservations")
+      .select("*")
+      .where("mobile_number", "like", `${mobile_number}%`);
+  }
+
+  return knex("reservations").select("*");
 }
 
 function read(reservation_id) {
   return knex("reservations")
     .select("*")
     .where({ reservation_id: reservation_id })
-    .first()
+    .first();
 }
 
 function updateReservation(reservation_id, status) {
   return knex("tables")
-      .where({ reservation_id: reservation_id })
-      .update({ status: status });
+    .where({ reservation_id: reservation_id })
+    .update({ status: status });
 }
 
 module.exports = {
