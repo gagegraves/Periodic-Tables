@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { createReservation } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function NewReservationForm() {
+export default function NewReservationForm({loadDashboard}) {
   const history = useHistory();
 
   const initialFormState = {
@@ -33,6 +33,7 @@ export default function NewReservationForm() {
       
       //* API call here
       await createReservation(formData, abortController.signal)
+        .then(loadDashboard)
         .then(() =>
           history.push(`/dashboard?date=${formData.reservation_date}`)
         )

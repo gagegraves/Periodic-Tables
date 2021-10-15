@@ -52,12 +52,6 @@ function Routes() {
     return () => abortController.abort();
   }
 
-  function handleCancel() {
-    if(window.confirm("Do you want to cancel this reservation? This cannot be undone.")) {
-  
-      window.location.reload(); 
-    }
-  }
 
   return (
     <Switch>
@@ -66,7 +60,6 @@ function Routes() {
         <SeatReservation
           tables={tables}
           loadDasboard={loadDashboard}
-          handleCancel={handleCancel}
         />
       </Route>
       
@@ -75,7 +68,7 @@ function Routes() {
       </Route>
 
       <Route exact={true} path="/reservations/new">
-        <NewReservationForm />
+        <NewReservationForm loadDashboard={loadDashboard}/>
       </Route>
 
       <Route exact={true} path="/tables/new">
@@ -83,10 +76,11 @@ function Routes() {
       </Route>
 
       <Route path="/search">
-        <Search handleCancel={handleCancel}/>
+        <Search />
       </Route>
 
-      <Route path="/dashboard">
+      <Route exact={true} path="/dashboard">
+        <Redirect to={`/dashboard?date=${date ? date : today()}`} />
         <Dashboard
           date={date ? date : today()}
           reservations={reservations}
@@ -98,7 +92,7 @@ function Routes() {
       </Route>
 
       <Route exact={true} path="/">
-        <Redirect to={"/dashboard"} />
+        <Redirect to={`/dashboard?date=${date ? date : today()}`} />
       </Route>
 
       <Route>

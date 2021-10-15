@@ -1,8 +1,42 @@
-export default function ReservationsTable({ reservations, handleCancel }) {
+import { updateReservationStatus } from "../utils/api";
+
+export default function ReservationsTable({ reservations, loadDashboard }) {
   if (!reservations || reservations.length < 1)
     return <p>No reservations found.</p>;
 
-  const rows = reservations.map(
+  function handleCancel({ target }) {
+    if (
+      window.confirm(
+        "Do you want to cancel this reservation? This cannot be undone."
+      )
+    ) {
+      const abortController = new AbortController();
+
+      updateReservationStatus(
+        target.value,
+        "cancelled",
+        abortController.status
+      ).then(loadDashboard);
+
+      return () => abortController.abort();
+    }
+  }
+//TODO: conditionally render reservations that aren;t cancelled!!!! gn homie
+  const validReservations = [];
+
+  console.log(reservations)
+  
+  for (const reservation in reservations) {
+    if (reservations.status !== "cancelled")
+    validReservations.push(reservation);
+  }
+  
+  console.log("~ validReservations", validReservations);
+  
+  if (validReservations.length === 0 || !validReservations)
+    return <p>No reservations found.</p>;
+
+  const rows = validReservations.map(
     (
       {
         reservation_id,
@@ -43,6 +77,7 @@ export default function ReservationsTable({ reservations, handleCancel }) {
             type="button"
             onClick={handleCancel}
             data-reservation-id-cancel={reservation_id}
+            value={reservation_id}
           >
             Cancel
           </button>

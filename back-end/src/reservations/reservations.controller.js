@@ -74,7 +74,9 @@ async function validateReservationId(req, res, next) {
 //makes sure the data sent in from the request matches the restaurants rules for reservations
 function validateReservationDate(req, res, next) {
   const reservation = req.body.data;
-  const reserveDate = new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000`);
+  const reserveDate = new Date(
+    `${reservation.reservation_date}T${reservation.reservation_time}:00.000`
+  );
   const today = new Date();
   const hours = reserveDate.getHours();
   const mins = reserveDate.getMinutes();
@@ -103,8 +105,7 @@ function validateReservationDate(req, res, next) {
   } else if (hours > 22 || (hours === 22 && mins >= 30)) {
     return next({
       status: 400,
-      message: 
-        "Reservation cannot be made: Restaurant is closed after 10:30PM",
+      message: "Reservation cannot be made: Restaurant is closed after 10:30PM",
     });
   } else if (hours > 21 || (hours === 21 && mins > 30)) {
     return next({
@@ -158,12 +159,12 @@ async function validateUpdateBody(req, res, next) {
 //return a list of all reservations from db
 async function list(req, res) {
   let { date = null } = req.query;
-  let {mobile_number = null} = req.query;
+  let { mobile_number = null } = req.query;
 
   const reservations = await service.list(date, mobile_number);
 
-  const response = reservations.filter((res) => res.status !== "finished")
-  
+  const response = reservations.filter((res) => res.status !== "finished");
+
   res.json({ data: response });
 }
 
@@ -174,17 +175,25 @@ async function read(req, res) {
 
 //creates a new reservation in the db with the data from the request
 async function create(req, res) {
-  const data = await service.create(req.body.data);
-  res.status(201).json({ data });
+  const response = await service.create(req.body.data);
+  res.status(201).json({ data: response });
 }
 
 //updates a reservation's status with the status that was sent in the update request
-async function updateReservation(req, res) {
-  await service.updateReservation(
+async function updateReservationStatus(req, res) {
+  await service.updateReservationStatus(
     res.locals.reservation.reservation_id,
     req.body.data.status
   );
   res.status(200).json({ data: { status: req.body.data.status } });
+}
+
+async function editReservation(req, res) {
+  const response = await service.editReservation(
+    res.locals.reservation.reservation_id,
+    req.body.data
+  );
+  res.status(200).json({ data: response });
 }
 
 module.exports = {
@@ -199,10 +208,18 @@ module.exports = {
     asyncErrorBoundary(create),
   ],
 
-  updateReservation: [
+  updateReservationStatus: [
     asyncErrorBoundary(validateDataExists),
     asyncErrorBoundary(validateReservationId),
     asyncErrorBoundary(validateUpdateBody),
-    asyncErrorBoundary(updateReservation),
+    asyncErrorBoundary(updateReservationStatus),
+  ],
+
+  editReservation: [
+    asyncErrorBoundary(validateDataExists),
+    asyncErrorBoundary(validateReservationId),
+    asyncErrorBoundary(validateRequiredProperties),
+    asyncErrorBoundary(validateReservationDate),
+    asyncErrorBoundary(editReservation),
   ],
 };

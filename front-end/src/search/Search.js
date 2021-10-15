@@ -3,7 +3,7 @@ import { listReservations } from "../utils/api";
 import ReservationsTable from "../dashboard/ReservationsTable";
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function Search({ handleCancel }) {
+export default function Search() {
   const [mobileNumber, setMobileNumber] = useState("");
   const [reservations, setReservations] = useState([]);
   const [renderReservationsTable, setRenderReservationsTable] = useState(false);
@@ -27,6 +27,7 @@ export default function Search({ handleCancel }) {
 	return () => abortController.abort();
 }
 
+
   return (
     <div>
         <h3>Search</h3>
@@ -46,7 +47,7 @@ export default function Search({ handleCancel }) {
 			<button type="submit" onClick={handleSubmit}>Find</button>
 		</form>
         { renderReservationsTable &&    
-      <ReservationsTable reservations={reservations} handleCancel={handleCancel} />
+      <ReservationsTable reservations={reservations} />
         }   
     </div>
   );

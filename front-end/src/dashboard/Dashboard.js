@@ -17,11 +17,11 @@ function Dashboard({ date, reservations, reservationsError, tables, tablesError 
       </div>
 
       <ErrorAlert error={reservationsError} />
-      <ReservationsTable reservations={reservations} />
+      <ReservationsTable reservations={reservations} loadDashboard={loadDashboard} />
 
       <h4 className="mb-0">Tables</h4>
       <ErrorAlert error={tablesError} />
-      <TablesTable tables={tables} loadDashboard={loadDashboard} history={history}/>
+      <TablesTable tables={tables} loadDashboard={loadDashboard} />
 
       <button type="button" onClick={() => history.push(`/dashboard?date=${previous(date)}`)}>Previous</button>
       <button type="button" onClick={() => history.push(`/dashboard?date=${today()}`)}>Today</button>
