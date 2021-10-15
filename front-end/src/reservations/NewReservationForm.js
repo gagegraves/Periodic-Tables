@@ -39,7 +39,9 @@ export default function NewReservationForm({loadDashboard}) {
         )
         .catch(setApiError);
     }
-    setSubmissionErrors(foundErrors);
+
+    if (foundErrors.length > 0) setSubmissionErrors(foundErrors);
+    
     return () => abortController.abort();
   }
 

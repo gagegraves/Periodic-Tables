@@ -44,7 +44,6 @@ export default function NewTable({ loadDashboard }) {
     }
 
 	if(formData.capacity < 1) {
-		console.log("Capacity on submission: ", formData.capacity)
 		foundError = { message: "Capacity cannot be less than 1."}
 	}
 

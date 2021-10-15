@@ -66,7 +66,6 @@ export default function EditReservationForm({ loadDashboard }) {
     const foundErrors = [];
 
     if (validateDate(foundErrors) && validateFields(foundErrors)) {
-      console.log(formData)
       //* API call here
       await editReservation(reservation_id, formData, abortController.signal)
         .then(loadDashboard)

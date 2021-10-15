@@ -24,7 +24,7 @@ export default function SeatReservation({ tables, loadDashboard }) {
 
     listReservations(null, abortController.abort())
       .then(setReservations)
-      .catch((error) => console.log(error));
+      .catch(setReservationsError);
 
     return () => abortController.abort();
   }, []);
@@ -39,37 +39,38 @@ export default function SeatReservation({ tables, loadDashboard }) {
   async function handleSubmit(event) {
     event.preventDefault();
     const abortController = new AbortController();
-    const foundErrors = [];
 
-    if (validateSeat(foundErrors)) {
-
-
+    if (validateSeat()) {
+      
+      //* API call here
       await seatTable(reservation_id, table_id, abortController.signal)
         .then(loadDashboard)
-        .then(() => history.push(`/dashboard?date=${foundReservation.reservation_date}`))
+        .then(() =>
+          history.push(`/dashboard?date=${foundReservation.reservation_date}`)
+        )
         .catch(setApiErrors);
     }
 
-    setErrors(foundErrors);
     return () => abortController.abort();
   }
 
-  function validateSeat(foundErrors) {
-    // we will need to use the find method here to get the actual table/reservation objects from their ids
+  function validateSeat() {
+    const foundErrors = [];
 
+    // we will need to use the find method here to get the actual table/reservation objects from their ids
     const foundTable = tables.find(
       (table) => table.table_id === Number(table_id)
     );
 
     if (!foundTable) {
       foundErrors.push("The table you selected does not exist.");
-    }
-    else if (!foundReservation) {
-      foundErrors.push({message: "This reservation does not exist."});
-    }
-    else {
+    } else if (!foundReservation) {
+      foundErrors.push({ message: "This reservation does not exist." });
+    } else {
       if (foundTable.status === "occupied") {
-        foundErrors.push({message: "The table you selected is currently occupied."});
+        foundErrors.push({
+          message: "The table you selected is currently occupied.",
+        });
       }
 
       if (foundTable.capacity < foundReservation.people) {
@@ -78,6 +79,9 @@ export default function SeatReservation({ tables, loadDashboard }) {
         });
       }
     }
+
+    if (foundErrors.length > 0) setErrors(foundErrors);
+
     // this conditional will either return true or false based off of whether foundErrors is equal to 0
     return foundErrors.length === 0;
   }
@@ -99,7 +103,6 @@ export default function SeatReservation({ tables, loadDashboard }) {
 
   return (
     <form className="form-select">
-      
       {errorsJSX()}
       <ErrorAlert error={reservationsError} />
       <ErrorAlert error={apiErrors} />
@@ -123,7 +126,6 @@ export default function SeatReservation({ tables, loadDashboard }) {
       <button type="button" onClick={history.goBack}>
         Cancel
       </button>
-
     </form>
   );
 }
