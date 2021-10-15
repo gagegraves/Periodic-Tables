@@ -21,22 +21,17 @@ export default function ReservationsTable({ reservations, loadDashboard }) {
       return () => abortController.abort();
     }
   }
-//TODO: conditionally render reservations that aren;t cancelled!!!! gn homie
-  const validReservations = [];
 
-  console.log(reservations)
-  
-  for (const reservation in reservations) {
-    if (reservations.status !== "cancelled")
-    validReservations.push(reservation);
+  const filteredReservations = [];
+
+  for (const reservation of reservations) {
+    if (reservation.status !== "cancelled") filteredReservations.push(reservation);
   }
-  
-  console.log("~ validReservations", validReservations);
-  
-  if (validReservations.length === 0 || !validReservations)
+
+  if (filteredReservations.length === 0 || !filteredReservations)
     return <p>No reservations found.</p>;
 
-  const rows = validReservations.map(
+  const rows = filteredReservations.map(
     (
       {
         reservation_id,

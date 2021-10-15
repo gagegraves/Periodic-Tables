@@ -83,7 +83,7 @@ export default function SeatReservation({ tables, loadDashboard }) {
   }
 
   //function that takes the table data from the API and formats it for the table selector in the seat reservations page
-  function tablesOptions() {
+  function availableTables() {
     return tables.map((table, index) => (
       <option key={table.table_id} value={table.table_id}>
         {table.table_name} - {table.capacity}
@@ -113,7 +113,7 @@ export default function SeatReservation({ tables, loadDashboard }) {
         onChange={handleChange}
       >
         <option value={0}>Choose a Table</option>
-        {tablesOptions()}
+        {availableTables()}
       </select>
 
       <button type="submit" onClick={(event) => handleSubmit(event)}>

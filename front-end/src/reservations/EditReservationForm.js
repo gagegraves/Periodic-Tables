@@ -35,19 +35,13 @@ export default function EditReservationForm({ loadDashboard }) {
       if (!foundReservation || foundReservation.status !== "booked") {
         return <p>Only booked reservations can be edited.</p>;
       }
-
-      const date = new Date(foundReservation.reservation_date);
-      const dateString = `${date.getFullYear()}-${(
-        "0" +
-        (date.getMonth() + 1)
-      ).slice(-2)}-${("0" + date.getDate()).slice(-2)}`;
-
+      
       setFormData({
         first_name: foundReservation.first_name,
         last_name: foundReservation.last_name,
         mobile_number: foundReservation.mobile_number,
-        reservation_date: dateString,
-        reservation_time: foundReservation.reservation_time,
+        reservation_date: foundReservation.reservation_date,
+        reservation_time: foundReservation.reservation_time.slice(0, -3),
         people: foundReservation.people,
       });
     }
@@ -72,6 +66,7 @@ export default function EditReservationForm({ loadDashboard }) {
     const foundErrors = [];
 
     if (validateDate(foundErrors) && validateFields(foundErrors)) {
+      console.log(formData)
       //* API call here
       await editReservation(reservation_id, formData, abortController.signal)
         .then(loadDashboard)

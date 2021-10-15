@@ -154,7 +154,7 @@ export default function NewReservationForm({loadDashboard}) {
               type="date"
               name="reservation_date"
               onChange={handleChange}
-              value={formData.date}
+              value={formData.reservation_date}
               required
             />
           </label>
@@ -165,7 +165,7 @@ export default function NewReservationForm({loadDashboard}) {
               type="time"
               name="reservation_time"
               onChange={handleChange}
-              value={formData.time}
+              value={formData.reservation_time}
               required
             />
           </label>
