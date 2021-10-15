@@ -76,8 +76,10 @@ function validateReservationDate(req, res, next) {
   const reservation = req.body.data;
   console.log("~ reservation", reservation);
   const reserveDate = new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000`);
+  
   console.log("~ reserveDate", reserveDate);
-  const today = new Date();
+  const today = new Date().toLocaleString();
+
   console.log("~ today", today);
   const hours = reserveDate.getHours();
   console.log("~ hours", hours);
