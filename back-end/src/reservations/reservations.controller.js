@@ -71,25 +71,33 @@ async function validateReservationId(req, res, next) {
   next();
 }
 
+
 //makes sure the data sent in from the request matches the restaurants rules for reservations
 function validateReservationDate(req, res, next) {
   const reservation = req.body.data;
-  const formattedFullDate = new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000`);
+  const formattedFullDate = `${reservation.reservation_date}T${reservation.reservation_time}:00.000`;
   console.log("~ formattedFullDate", formattedFullDate);
-  const reserveFullDate = formattedFullDate.toLocaleString();
+  
+  const convertLocalTimeToUTCTime = (dateToConvert) => {
+    const [fullDate, time] = dateToConvert.split('T');
+    const [year, month, date] = fullDate.split('-');
+    const [hour, minute, second] = time.split(':');
+    const dateTime = new Date(year, month, date, hour, minute, second);
+    return dateTime.toISOString();
+   };
 
-  const reserveDate = new Date(reserveFullDate)
+  const reserveDate = new Date(convertLocalTimeToUTCTime(formattedFullDate))
   console.log("~ reserveDate", reserveDate);
 
   const today = new Date();
 
   console.log("~ today", today);
 
-  const hours = formattedFullDate.getHours();
-  const mins = formattedFullDate.getMinutes();
+  const hours = reserveDate.getHours();
+  const mins = reserveDate.getMinutes();
 
 
-  if (formattedFullDate.getDay() === 2) {
+  if (reserveDate.getDay() === 2) {
     return next({
       status: 400,
       message: "Reservation cannot be made: Restaurant is closed on Tuesdays",
