@@ -76,23 +76,12 @@ async function validateReservationId(req, res, next) {
 function validateReservationDate(req, res, next) {
   const reservation = req.body.data;
 
-  console.log("~ reservation", reservation);
-
-  const hours = new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000`).getHours();
-  const reserveDate = new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000Z`);
-  
-  console.log("~ reserveDate", reserveDate);
-  
+ //these dates are formatted to specifically pass the tests locally, and also work while deployed.
+  const reserveDate = new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000Z`); 
   const today = new Date();
   today.setHours(today.getHours() - 7)
-
-  console.log("~ today", today);
-
-  // const hours = reserveDateforComparison.getHours();
-  console.log("~ hours", hours);
+  const hours = new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000`).getHours();
   const mins = reserveDate.getMinutes();
-  console.log("~ mins", mins);
-
 
   if (reserveDate.getDay() === 2) {
     return next({
