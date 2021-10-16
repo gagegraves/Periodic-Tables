@@ -75,26 +75,23 @@ async function validateReservationId(req, res, next) {
 //makes sure the data sent in from the request matches the restaurants rules for reservations
 function validateReservationDate(req, res, next) {
   const reservation = req.body.data;
-  const formattedFullDate = `${reservation.reservation_date}T${reservation.reservation_time}:00.000`;
-  console.log("~ formattedFullDate", formattedFullDate);
+
+  console.log("~ reservation", reservation);
+
+  const hours = new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000`).getHours();
+  const reserveDate = new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000Z`);
   
-  const convertLocalTimeToUTCTime = (dateToConvert) => {
-    const [fullDate, time] = dateToConvert.split('T');
-    const [year, month, date] = fullDate.split('-');
-    const [hour, minute, second] = time.split(':');
-    const dateTime = new Date(year, month, date, hour, minute, second);
-    return dateTime.toISOString();
-   };
-
-  const reserveDate = new Date(convertLocalTimeToUTCTime(formattedFullDate))
   console.log("~ reserveDate", reserveDate);
-
+  
   const today = new Date();
+  today.setHours(today.getHours() - 7)
 
   console.log("~ today", today);
 
-  const hours = reserveDate.getHours();
+  // const hours = reserveDateforComparison.getHours();
+  console.log("~ hours", hours);
   const mins = reserveDate.getMinutes();
+  console.log("~ mins", mins);
 
 
   if (reserveDate.getDay() === 2) {
@@ -131,7 +128,7 @@ function validateReservationDate(req, res, next) {
     });
   }
 
-  if (!Date.parse(formattedFullDate)) {
+  if (!Date.parse(reserveDate)) {
     return next({
       status: 400,
       message:
