@@ -1,18 +1,25 @@
 import { freeTable } from "../utils/api";
 
 export default function TablesTables({ tables, loadDashboard }) {
-  if (!tables || tables.length < 1) return null;
+  if (!tables || tables.length < 1) {
+    return (
+      <p>No tables laoded.</p>
+    )
+  };
 
+  //invoked when a user clicks the finish button next to a table
    async function handleFinish({ target }) {
     if (window.confirm("Is this table ready to seat new guests? This cannot be undone.")) {
       const abortController = new AbortController();
 
+      //*API call
       await freeTable(target.value, abortController.signal).then(loadDashboard);
 
       return () => abortController.abort(); 
     }
   }
 
+  //map reservations into a JSX table  to be rendered
   const rows = tables.map(
     ({ table_id, table_name, capacity, status }, index) => (
       <tr key={table_id}>

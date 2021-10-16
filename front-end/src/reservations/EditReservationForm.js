@@ -5,6 +5,8 @@ import ErrorAlert from "../layout/ErrorAlert";
 
 export default function EditReservationForm({ loadDashboard }) {
   const history = useHistory();
+
+  //object that we can use the clear th form, i.e. upon re-render
   const initialFormState = {
     first_name: "",
     last_name: "",
@@ -13,39 +15,42 @@ export default function EditReservationForm({ loadDashboard }) {
     reservation_date: "",
     reservation_time: "",
   };
+
+  //dynamic variables we want to keep track of
   const { reservation_id } = useParams();
   const [formData, setFormData] = useState({ ...initialFormState });
   const [errors, setErrors] = useState([]);
   const [apiError, setApiError] = useState(null);
   const [reservationsError, setReservationsError] = useState([]);
+  const [foundReservation, setFoundReservation] = useState(null);
+  const [invalidIdError, setInvalidIdError] = useState(null);
 
-  //this useEffect loads the existing reservation data into the form
+  //this useEffect loads the existing reservation data that we are editing into the form
   useEffect(() => {
     if (!reservation_id) return null;
 
-    loadReservations()
+    //invokes API call and returns reservation we are editing and setting variables accordingly
+        loadReservations()
       .then((response) =>
         response.find(
           (reservation) => reservation.reservation_id === Number(reservation_id)
         )
       )
-      .then(fillFields);
+      .then((response) => {
+        setFoundReservation(response);
+        setFormData({
+          first_name: response.first_name,
+          last_name: response.last_name,
+          mobile_number: response.mobile_number,
+          reservation_date: response.reservation_date,
+          reservation_time: response.reservation_time.slice(0, -3),
+          people: response.people,
+        });
+      })
+      .catch(setInvalidIdError);
 
-    function fillFields(foundReservation) {
-      if (!foundReservation || foundReservation.status !== "booked") {
-        return <p>Only booked reservations can be edited.</p>;
-      }
-      
-      setFormData({
-        first_name: foundReservation.first_name,
-        last_name: foundReservation.last_name,
-        mobile_number: foundReservation.mobile_number,
-        reservation_date: foundReservation.reservation_date,
-        reservation_time: foundReservation.reservation_time.slice(0, -3),
-        people: foundReservation.people,
-      });
-    }
 
+      //* API call
     async function loadReservations() {
       const abortController = new AbortController();
       return await listReservations(null, abortController.signal).catch(
@@ -54,8 +59,12 @@ export default function EditReservationForm({ loadDashboard }) {
     }
   }, [reservation_id]);
 
+  //called when user interacts with an input to store the data in a variable that we can use
   function handleChange({ target }) {
-    setFormData({...formData, [target.name]: target.name === "people" ? Number(target.value) : target.value,
+    setFormData({
+      ...formData,
+      [target.name]:
+        target.name === "people" ? Number(target.value) : target.value,
     });
   }
 
@@ -75,7 +84,8 @@ export default function EditReservationForm({ loadDashboard }) {
         .catch(setApiError);
     }
 
-    setErrors(foundErrors);
+    if (foundErrors.length > 0) setErrors(foundErrors);
+
     return () => abortController.abort();
   }
 
@@ -121,6 +131,7 @@ export default function EditReservationForm({ loadDashboard }) {
     return foundErrors.length === 0;
   }
 
+  //verifies all required fields exist and contain valid data
   function validateFields(foundErrors) {
     for (const field in formData) {
       if (formData[field] === "") {
@@ -141,12 +152,31 @@ export default function EditReservationForm({ loadDashboard }) {
     return foundErrors.length === 0;
   }
 
+//if the requested reservation to be edited is invalid or doesnt exist, return alternate render
+  if (!foundReservation || foundReservation.status !== "booked") {
+    if (invalidIdError) {
+      return (
+        <div>
+          <h4>Reservation does not exist!</h4>
+          <button onClick={() => history.goBack()}>Go Back</button>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <h4>Only booked reservations can be edited!</h4>
+          <button onClick={() => history.goBack()}>Go Back</button>
+        </div>
+      );
+    }
+  }
+  //map all found frontend validation errors into an array of ErrorAlert modules to be rendered  conditionally
   function errorsJSX() {
     return errors.map((error, index) => (
       <ErrorAlert key={index} error={error} />
     ));
   }
-
+  
   return (
     <div>
       <h4>Edit Reservation</h4>
@@ -154,7 +184,7 @@ export default function EditReservationForm({ loadDashboard }) {
       <ErrorAlert error={apiError} />
       {reservationsError.length > 0 && <ErrorAlert error={reservationsError} />}
       <div>
-        <form onSubmit={handleSubmit}>
+        <form>
           <label htmlFor="first_name">
             First Name
             <input
@@ -225,7 +255,7 @@ export default function EditReservationForm({ loadDashboard }) {
             />
           </label>
           <br />
-          <button type="submit" onClick={(event) => handleSubmit(event)}>
+          <button type="submit" onClick={handleSubmit}>
             Submit
           </button>
           <button type="button" onClick={() => history.goBack()}>

@@ -1,10 +1,13 @@
 import { updateReservationStatus } from "../utils/api";
 
+//component that renders a table of reservations
 export default function ReservationsTable({ reservations, loadDashboard }) {
   if (!reservations || reservations.length < 1)
-    return <p>No reservations found.</p>;
+    return <p>No reservations found for this date. Click "New Reservation" on the left to create one!</p>;
 
-  function handleCancel({ target }) {
+
+    //invoked when a user clicks te cancel button on a reservation
+ async function handleCancel({ target }) {
     if (
       window.confirm(
         "Do you want to cancel this reservation? This cannot be undone."
@@ -12,7 +15,8 @@ export default function ReservationsTable({ reservations, loadDashboard }) {
     ) {
       const abortController = new AbortController();
 
-      updateReservationStatus(
+      //* API call
+     await updateReservationStatus(
         target.value,
         "cancelled",
         abortController.status
@@ -22,15 +26,17 @@ export default function ReservationsTable({ reservations, loadDashboard }) {
     }
   }
 
+  //filters out cancelled reservations from rendering into the table
   const filteredReservations = [];
-
   for (const reservation of reservations) {
     if (reservation.status !== "cancelled") filteredReservations.push(reservation);
   }
+  //if there are no active reservations, return alternate render
+  if (filteredReservations.length === 0 || !filteredReservations){
+    return <p>No reservations found for this date. Click "New Reservation" on the left to create one!</p>
+  };
 
-  if (filteredReservations.length === 0 || !filteredReservations)
-    return <p>No reservations found.</p>;
-
+  //map reservations into a JSX table  to be rendered
   const rows = filteredReservations.map(
     (
       {
@@ -46,6 +52,7 @@ export default function ReservationsTable({ reservations, loadDashboard }) {
       index
     ) => (
       <tr key={reservation_id}>
+
         <td>{first_name}</td>
         <td>{last_name}</td>
         <td>{mobile_number}</td>
@@ -67,6 +74,7 @@ export default function ReservationsTable({ reservations, loadDashboard }) {
             <button type="button">Edit</button>
           </a>
         </td>
+
         <td>
           <button
             type="button"
@@ -77,6 +85,7 @@ export default function ReservationsTable({ reservations, loadDashboard }) {
             Cancel
           </button>
         </td>
+
       </tr>
     )
   );
@@ -92,12 +101,11 @@ export default function ReservationsTable({ reservations, loadDashboard }) {
           <th scope="col">Reservation Date</th>
           <th scope="col">Reservation Time</th>
           <th scope="col">Status</th>
-          {/* <th scope="col">Seat</th>
-          <th scope="col">Edit</th>
-          <th scope="col">Cancel</th> */}
         </tr>
       </thead>
+
       <tbody>{rows}</tbody>
+
     </table>
   );
 }

@@ -3,23 +3,26 @@ import { listReservations } from "../utils/api";
 import ReservationsTable from "../dashboard/ReservationsTable";
 import ErrorAlert from "../layout/ErrorAlert";
 
+//component that renders on /search
 export default function Search() {
   const [mobileNumber, setMobileNumber] = useState("");
   const [reservations, setReservations] = useState([]);
   const [renderReservationsTable, setRenderReservationsTable] = useState(false);
-
   const [error, setError] = useState(null);
 
+  //called when user interacts with an input to store the data in a variable that we can use
   function handleChange({ target }) {
     setMobileNumber(target.value);
   }
 
-  function handleSubmit(event) {
+  //invoked upon search submission, returns search results
+  async function handleSubmit(event) {
 	event.preventDefault();
 	const abortController = new AbortController();
 	setError(null);
 
-	listReservations({ mobile_number: mobileNumber }, abortController.signal)
+	//*API call
+	await listReservations({ mobile_number: mobileNumber }, abortController.signal)
 		.then(setReservations)
         .then(setRenderReservationsTable(true))
 		.catch(setError);
@@ -46,9 +49,11 @@ export default function Search() {
 
 			<button type="submit" onClick={handleSubmit}>Find</button>
 		</form>
+
         { renderReservationsTable &&    
       <ReservationsTable reservations={reservations} />
         }   
+		
     </div>
   );
 }

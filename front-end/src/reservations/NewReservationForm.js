@@ -6,6 +6,7 @@ import ErrorAlert from "../layout/ErrorAlert";
 export default function NewReservationForm({loadDashboard}) {
   const history = useHistory();
 
+  //object that we can use the clear th form, i.e. upon re-render
   const initialFormState = {
     first_name: "",
     last_name: "",
@@ -15,6 +16,7 @@ export default function NewReservationForm({loadDashboard}) {
     reservation_time: "",
   };
 
+  //dynamic variables we want to keep track of
   const [formData, setFormData] = useState({ ...initialFormState });
   const [submissionErrors, setSubmissionErrors] = useState([]);
   const [apiError, setApiError] = useState(null);
@@ -87,6 +89,7 @@ export default function NewReservationForm({loadDashboard}) {
     return foundErrors.length === 0;
   }
 
+  //verifies all required fields exist and contain valid data
   function validateFields(foundErrors) {
     for(const field in formData) {
       if(formData[field] === "") {
@@ -113,7 +116,7 @@ export default function NewReservationForm({loadDashboard}) {
       {errorsJSX()}
       <ErrorAlert error={apiError} />
       <div>
-        <form onSubmit={handleSubmit}>
+        <form>
           <label htmlFor="first_name">
             First Name
             <input
@@ -184,7 +187,7 @@ export default function NewReservationForm({loadDashboard}) {
             />
           </label>
           <br />
-          <button type="submit" onClick={(event) => handleSubmit(event)}>
+          <button type="submit" onClick={handleSubmit}>
             Submit
           </button>
           <button type="button" onClick={() => history.goBack()}>

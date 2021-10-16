@@ -26,7 +26,6 @@ function Routes() {
   //these values will be defined by an API call and passed down as props to all the components that require them
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
-
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
 
@@ -34,13 +33,15 @@ function Routes() {
   useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
-    //abort controller used to avoid race conditions in async calls
+    const abortController = new AbortController();
+
+    //reset all tracked variables before the API call to refresh the data
     setReservations([]);
     setTables([]);
     setReservationsError(null);
     setTablesError(null);
-    const abortController = new AbortController();
 
+    //*API call
     // the first parameter { date } is the search parameter for the database, and also the value of 'date'
     listReservations({ date }, abortController.signal)
       .then(setReservations)

@@ -6,40 +6,45 @@ import { listReservations, seatTable } from "../utils/api";
 export default function SeatReservation({ tables, loadDashboard }) {
   const history = useHistory();
 
+  //dynamic variables we want to keep track of
   const [reservations, setReservations] = useState([]);
-  const [reservationsError, setReservationsError] = useState(null);
+  const [reservationsApiError, setReservationsApiError] = useState(null);
   const [table_id, setTableId] = useState(0);
   const [errors, setErrors] = useState([]);
   const [apiErrors, setApiErrors] = useState(null);
 
+  //this stores the reservation we are wanting to seat in a variable so we can change it's status once seated
   const { reservation_id } = useParams();
   const foundReservation = reservations.find(
     (reservation) => reservation.reservation_id === Number(reservation_id)
   );
 
-  //make an API call to retrieve all reservations on first render
+  //make an API call to retrieve all reservations on first render, which the above .find() uses to find our reservation
   useEffect(() => {
     const abortController = new AbortController();
-    setReservationsError(null);
+    setReservationsApiError(null);
 
     listReservations(null, abortController.abort())
       .then(setReservations)
-      .catch(setReservationsError);
+      .catch(setReservationsApiError);
 
     return () => abortController.abort();
   }, []);
 
-  //if there are either no tables or no reservations returned by the API, return null
+  //if there are either no tables or no reservations returned by the API, do not render
   if (!tables || !reservations) return null;
 
+  //called when user interacts with an input to store the data in a variable that we can use
   function handleChange({ target }) {
     setTableId(target.value);
   }
 
+  //called when the form is submitted, handles the API call and re-renders the dashboard
   async function handleSubmit(event) {
     event.preventDefault();
     const abortController = new AbortController();
 
+    //if check to call validation function, returns true or false
     if (validateSeat()) {
       
       //* API call here
@@ -54,10 +59,11 @@ export default function SeatReservation({ tables, loadDashboard }) {
     return () => abortController.abort();
   }
 
+  //validation funtion to ensure the table exists and is available
   function validateSeat() {
     const foundErrors = [];
 
-    // we will need to use the find method here to get the actual table/reservation objects from their ids
+    // this find() iterates through the {tables} prop to store the table the user submitted
     const foundTable = tables.find(
       (table) => table.table_id === Number(table_id)
     );
@@ -86,7 +92,7 @@ export default function SeatReservation({ tables, loadDashboard }) {
     return foundErrors.length === 0;
   }
 
-  //function that takes the table data from the API and formats it for the table selector in the seat reservations page
+  //function that iterates through { tables } and formats it for the table selector on the seat reservations page
   function availableTables() {
     return tables.map((table, index) => (
       <option key={table.table_id} value={table.table_id}>
@@ -95,6 +101,7 @@ export default function SeatReservation({ tables, loadDashboard }) {
     ));
   }
 
+  //map all found frontend validation errors into an array of ErrorAlert modules to be rendered  conditionally
   function errorsJSX() {
     return errors.map((error, index) => (
       <ErrorAlert key={index} error={error} />
@@ -104,7 +111,7 @@ export default function SeatReservation({ tables, loadDashboard }) {
   return (
     <form className="form-select">
       {errorsJSX()}
-      <ErrorAlert error={reservationsError} />
+      <ErrorAlert error={reservationsApiError} />
       <ErrorAlert error={apiErrors} />
 
       <label htnlfor="table_id">Choose Table</label>
@@ -119,7 +126,7 @@ export default function SeatReservation({ tables, loadDashboard }) {
         {availableTables()}
       </select>
 
-      <button type="submit" onClick={(event) => handleSubmit(event)}>
+      <button type="submit" onClick={handleSubmit}>
         Submit
       </button>
 
