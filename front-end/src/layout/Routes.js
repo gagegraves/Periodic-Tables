@@ -5,7 +5,6 @@ import useQuery from "../utils/useQuery";
 import Dashboard from "../dashboard/Dashboard";
 import NewTable from "../tables/NewTable";
 import NewReservationForm from "../reservations/NewReservationForm";
-import EditReservationForm from "../reservations/EditReservationForm";
 import SeatReservation from "../reservations/SeatReservation";
 import Search from "../search/Search"
 import NotFound from "./NotFound";
@@ -35,15 +34,12 @@ function Routes() {
   function loadDashboard() {
     const abortController = new AbortController();
 
-    //reset all tracked variables before the API call to refresh the data
-    setReservations([]);
-    setTables([]);
     setReservationsError(null);
     setTablesError(null);
 
     //*API call
     // the first parameter { date } is the search parameter for the database, and also the value of 'date'
-    listReservations({ date }, abortController.signal)
+    listReservations({ date: date }, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
 
@@ -64,13 +60,16 @@ function Routes() {
         />
       </Route>
       
-      <Route exact={true} path="/reservations/:reservation_id/edit">
-        <EditReservationForm reservations={reservations} loadDasboard={loadDashboard}/>
-      </Route>
-
-      <Route exact={true} path="/reservations/new">
+      <Route path="/reservations/new">
         <NewReservationForm loadDashboard={loadDashboard}/>
       </Route>
+      
+      <Route path="/reservations/:reservation_id/edit">
+				<NewReservationForm
+					loadDashboard={loadDashboard}
+					edit={true}
+				/>
+			</Route>
 
       <Route exact={true} path="/tables/new">
         <NewTable loadDashboard={loadDashboard} />

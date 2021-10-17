@@ -31,6 +31,10 @@ function validateRequiredProperties(req, res, next) {
     }
   }
 
+  if(Number.isNaN(Date.parse(`${req.body.data.reservation_date} ${req.body.data.reservation_time}`))) {
+		return next({ status: 400, message: "'reservation_date' or 'reservation_time' field is in an incorrect format" });
+	}
+
   if (typeof reservation.people !== "number") {
     return next({
       status: 400,
@@ -73,59 +77,31 @@ async function validateReservationId(req, res, next) {
 
 
 //makes sure the data sent in from the request matches the restaurants rules for reservations
-function validateReservationDate(req, res, next) {
-  const reservation = req.body.data;
+async function validateReservationDate(req, res, next) {
+	const reserveDate = new Date(`${req.body.data.reservation_date}T${req.body.data.reservation_time}:00.000`);
+	const todaysDate = new Date();
 
- //these dates are formatted to specifically pass the tests locally, and also work while deployed.
-  const reserveDate = new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000Z`); 
-  const today = new Date();
-  today.setHours(today.getHours() - 7)
-  const hours = new Date(`${reservation.reservation_date}T${reservation.reservation_time}:00.000`).getHours();
-  const mins = reserveDate.getMinutes();
+	if(reserveDate.getDay() === 2) {  
+		return next({ status: 400, message: "'reservation_date' field: restauraunt is closed on tuesday" });
+	}
 
-  if (reserveDate.getDay() === 2) {
-    return next({
-      status: 400,
-      message: "Reservation cannot be made: Restaurant is closed on Tuesdays",
-    });
-  }
+	if(reserveDate < todaysDate) {
+		return next({ status: 400, message: "'reservation_date' and 'reservation_time' field must be in the future" });
+	}
 
-  if (reserveDate < today) {
-    return next({
-      status: 400,
-      message:
-        "Reservation cannot be made: Reservations must be set for a future date",
-    });
-  }
+	if(reserveDate.getHours() < 10 || (reserveDate.getHours() === 10 && reserveDate.getMinutes() < 30)) {
+		return next({ status: 400, message: "'reservation_time' field: restaurant is not open until 10:30AM" });
+	}
 
-  if (hours < 10 || (hours === 10 && mins < 30)) {
-    return next({
-      status: 400,
-      message:
-        "Reservation cannot be made: Restaurant is not open until 10:30AM",
-    });
-  } else if (hours > 22 || (hours === 22 && mins >= 30)) {
-    return next({
-      status: 400,
-      message: "Reservation cannot be made: Restaurant is closed after 10:30PM",
-    });
-  } else if (hours > 21 || (hours === 21 && mins > 30)) {
-    return next({
-      status: 400,
-      message:
-        "Reservation cannot be made: Reservation must be made at least an hour before closing time (10:30PM)",
-    });
-  }
+	if(reserveDate.getHours() > 22 || (reserveDate.getHours() === 22 && reserveDate.getMinutes() >= 30)) {
+		return next({ status: 400, message: "'reservation_time' field: restaurant is closed after 10:30PM" });
+	}
 
-  if (!Date.parse(reserveDate)) {
-    return next({
-      status: 400,
-      message:
-        "Reservation cannot be made: Invalid reservation_date/reservation_time",
-    });
-  }
+	if(reserveDate.getHours() > 21 || (reserveDate.getHours() === 21 && reserveDate.getMinutes() > 30)) {
+		return next({ status: 400, message: "'reservation_time' field: reservation must be made at least an hour before closing (10:30PM)" })
+	}
 
-  next();
+	next();
 }
 
 //verifies that the status of the reservation  in a update request allows it to be updated, i.e. it's

@@ -100,7 +100,7 @@ export default function ReservationsTable({ reservations, loadDashboard }) {
 
     <table className="table table-responsive-md table-hover ">
       <thead>
-        <tr> {}
+        <tr>
           <th className="text-center"scope="col">First Name</th>
           <th className="text-center"scope="col">Last Name</th>
           <th className="text-center"scope="col">Mobile Number</th>

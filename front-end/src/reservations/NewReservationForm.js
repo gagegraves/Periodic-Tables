@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
-import { createReservation } from "../utils/api";
+import React, { useState, useEffect } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
+import { createReservation, editReservation, listReservations } from "../utils/api";
 
-export default function NewReservationForm({ loadDashboard }) {
+export default function NewReservationForm({ loadDashboard, edit }) {
   const history = useHistory();
+  const { reservation_id } = useParams();
 
-  //object that we can use the clear th form, i.e. upon re-render
+  //object that we can use the clear the form, i.e. upon re-render
   const initialFormState = {
     first_name: "",
     last_name: "",
@@ -18,8 +19,49 @@ export default function NewReservationForm({ loadDashboard }) {
 
   //dynamic variables we want to keep track of
   const [formData, setFormData] = useState({ ...initialFormState });
-  const [submissionErrors, setSubmissionErrors] = useState([]);
+  const [reservationErrors, setReservationErrors] = useState(null);
   const [apiError, setApiError] = useState(null);
+  const [errors, setErrors] = useState([])
+  const [foundReservation, setFoundReservation] = useState(null)
+  const [invalidIdError, setInvalidIdError] = useState(null);
+
+  //this useEffect loads the existing reservation data that we are editing into the form
+  useEffect(() => {
+		if(edit) {
+			if(!reservation_id) return null;
+
+       //invokes API call and returns reservation we are editing and setting variables accordingly
+			loadReservations()
+				.then((response) => response.find((reservation) => 
+					reservation.reservation_id === Number(reservation_id)))
+				.then(fillFields)
+        .catch(setInvalidIdError);
+		}
+
+
+		function fillFields(apiReservation) {
+			if(!apiReservation || apiReservation.status !== "booked") {
+				return <p>Only booked reservations can be edited.</p>;
+      }
+
+      setFoundReservation(apiReservation)
+
+			setFormData({
+				first_name: apiReservation.first_name,
+				last_name: apiReservation.last_name,
+				mobile_number: apiReservation.mobile_number,
+				reservation_date: apiReservation.reservation_date,
+				reservation_time: apiReservation.reservation_time.slice(0, -3),
+				people: apiReservation.people,
+			});
+		}
+
+		async function loadReservations() {
+			const abortController = new AbortController();
+			return await listReservations(null, abortController.signal)
+				.catch(setReservationErrors);
+		}
+	}, [edit, reservation_id]);
 
   function handleChange({ target }) {
     setFormData({
@@ -37,60 +79,52 @@ export default function NewReservationForm({ loadDashboard }) {
 
     if (validateDate(foundErrors) && validateFields(foundErrors)) {
       //* API call here
-      await createReservation(formData, abortController.signal)
-        .then(loadDashboard)
-        .then(() =>
-          history.push(`/dashboard?date=${formData.reservation_date}`)
-        )
-        .catch(setApiError);
+      if(edit) {
+        console.log("edit: ", formData)
+				editReservation(reservation_id, formData, abortController.signal)
+					.then(loadDashboard)
+					.then(() => history.push(`/dashboard?date=${formData.reservation_date}`))
+					.catch(setApiError);
+			}
+			else {
+        console.log("new: ", formData)
+				createReservation(formData, abortController.signal)
+					.then(loadDashboard)
+					.then(() => history.push(`/dashboard?date=${formData.reservation_date}`))
+					.catch(setApiError);
+			}
     }
 
-    if (foundErrors.length > 0) setSubmissionErrors(foundErrors);
+    if (foundErrors.length > 0) setErrors(foundErrors);
 
     return () => abortController.abort();
   }
 
   //the validation function to ensure that the date and time being set for the reservation are during the restaurants open hours
   function validateDate(foundErrors) {
-    //a string that is a full JS-formatted date/time
-    const reserveDate = new Date(
-      `${formData.reservation_date}T${formData.reservation_time}:00.000`
-    );
-    //grab todays date, and the hours/mniutes of the submitted reservation time for reference/validation
-    const today = new Date();
-    const hours = reserveDate.getHours();
-    const mins = reserveDate.getMinutes();
+		const reserveDate = new Date(`${formData.reservation_date}T${formData.reservation_time}:00.000`);
+		const todaysDate = new Date();
 
-    if (reserveDate.getDay() === 2) {
-      foundErrors.push({
-        message:
-          "Reservation cannot be made: Restaurant is closed on Tuesdays.",
-      });
-    }
-    if (reserveDate < today) {
-      foundErrors.push({
-        message:
-          "Reservation cannot be made: Reservations must be set for a future date.",
-      });
-    }
-    if (hours < 10 || (hours === 10 && mins < 30)) {
-      foundErrors.push({
-        message:
-          "Reservation cannot be made: Restaurant is not open until 10:30AM.",
-      });
-    } else if (hours > 22 || (hours === 22 && mins >= 30)) {
-      foundErrors.push({
-        message:
-          "Reservation cannot be made: Restaurant is closed after 10:30PM.",
-      });
-    } else if (hours > 21 || (hours === 21 && mins > 30)) {
-      foundErrors.push({
-        message:
-          "Reservation cannot be made: Reservation must be made at least an hour before closing. (10:30PM).",
-      });
-    }
-    return foundErrors.length === 0;
-  }
+		if(reserveDate.getDay() === 2) {  
+			foundErrors.push({ message: "Reservation cannot be made: Restaurant is closed on Tuesdays." });
+		}
+
+		if(reserveDate < todaysDate) {
+			foundErrors.push({ message: "Reservation cannot be made: Date/Time is in the past." });
+		}
+
+		if(reserveDate.getHours() < 10 || (reserveDate.getHours() === 10 && reserveDate.getMinutes() < 30)) {
+			foundErrors.push({ message: "Reservation cannot be made: Restaurant is not open until 10:30AM." });
+		}
+		else if(reserveDate.getHours() > 22 || (reserveDate.getHours() === 22 && reserveDate.getMinutes() >= 30)) {
+			foundErrors.push({ message: "Reservation cannot be made: Restaurant is closed after 10:30PM." });
+		}
+		else if(reserveDate.getHours() > 21 || (reserveDate.getHours() === 21 && reserveDate.getMinutes() > 30)) {
+			foundErrors.push({ message: "Reservation cannot be made: Reservation must be made at least an hour before closing (10:30PM)." })
+		}
+
+		return foundErrors.length === 0;
+	}
 
   //verifies all required fields exist and contain valid data
   function validateFields(foundErrors) {
@@ -113,19 +147,36 @@ export default function NewReservationForm({ loadDashboard }) {
     return foundErrors.length === 0;
   }
 
+  //if the requested reservation to be edited is invalid or doesnt exist, return alternate render
+  if (!foundReservation || foundReservation.status !== "booked") {
+    if (invalidIdError) {
+      return (
+        <div>
+          <h4>Reservation does not exist!</h4>
+          <button className="btn btn-danger" onClick={() => history.goBack()}>Go Back</button>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <h4>Only booked reservations can be edited!</h4>
+          <button className="btn btn-danger" onClick={() => history.goBack()}>Go Back</button>
+        </div>
+      );
+    }
+  }
+
   function errorsJSX() {
-    return submissionErrors.map((error, index) => (
+    return errors.map((error, index) => (
       <ErrorAlert key={index} error={error} />
     ));
   }
 
   return (
     <div>
-      <div>
-        <h3 className="mb-3 pt-2">New Reservation</h3>
-      </div>
       {errorsJSX()}
       <ErrorAlert error={apiError} />
+      <ErrorAlert error={reservationErrors} />
       <div>
         <form className="row">
           <div className="col-md-6 mb-3">

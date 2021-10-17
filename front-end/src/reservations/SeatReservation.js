@@ -103,7 +103,7 @@ export default function SeatReservation({ tables, loadDashboard }) {
   //map all found frontend validation errors into an array of ErrorAlert modules to be rendered  conditionally
   function errorsJSX() {
     return errors.map((error, index) => (
-      <ErrorAlert key={index} error={error} />
+      <ErrorAlert error={error} />
     ));
   }
 
