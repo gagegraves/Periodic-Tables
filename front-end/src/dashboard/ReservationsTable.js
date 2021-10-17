@@ -3,7 +3,7 @@ import { updateReservationStatus } from "../utils/api";
 //component that renders a table of reservations
 export default function ReservationsTable({ reservations, loadDashboard }) {
   if (!reservations || reservations.length < 1)
-    return <p>No reservations found for this date. Click "New Reservation" on the left to create one!</p>;
+    return <p>No reservations found for this date. Click "New Reservation" to create one!</p>;
 
 
     //invoked when a user clicks te cancel button on a reservation
@@ -33,7 +33,7 @@ export default function ReservationsTable({ reservations, loadDashboard }) {
   }
   //if there are no active reservations, return alternate render
   if (filteredReservations.length === 0 || !filteredReservations){
-    return <p>No reservations found for this date. Click "New Reservation" on the left to create one!</p>
+    return <p>No reservations found for this date. Click "New Reservation" to create one!</p>
   };
 
   //map reservations into a JSX table  to be rendered
@@ -51,39 +51,44 @@ export default function ReservationsTable({ reservations, loadDashboard }) {
       },
       index
     ) => (
-      <tr key={reservation_id}>
+      <tr key={reservation_id} className ="">
 
-        <td>{first_name}</td>
-        <td>{last_name}</td>
-        <td>{mobile_number}</td>
-        <td>{people}</td>
-        <td>{reservation_date}</td>
-        <td>{reservation_time}</td>
-        <td data-reservation-id-status={reservation_id}>{status}</td>
+        <td className="text-center">{first_name}</td>
+        <td className="text-center">{last_name}</td>
+        <td className="text-center">{mobile_number}</td>
+        <td className="text-center">{people}</td>
+        <td className="text-center">{reservation_date}</td>
+        <td className="text-center">{reservation_time}</td>
+        <td className="text-center" data-reservation-id-status={reservation_id}>{status}</td>
 
         {status === "booked" && (
           <td>
             <a href={`/reservations/${reservation_id}/seat`}>
-              <button type="button">Seat</button>
+              <button className="btn btn-success rounded-pill"type="button">Seat</button>
             </a>
           </td>
         )}
-
+        
+        {status === "booked" && (
         <td>
           <a href={`/reservations/${reservation_id}/edit`}>
-            <button type="button">Edit</button>
+            <button className="btn btn-primary rounded-pill" type="button">Edit</button>
           </a>
         </td>
+        )}
 
         <td>
-          <button
-            type="button"
-            onClick={handleCancel}
-            data-reservation-id-cancel={reservation_id}
-            value={reservation_id}
-          >
-            Cancel
-          </button>
+
+      <button
+        className="btn btn-danger rounded-pill"
+        type="button"
+        onClick={handleCancel}
+        data-reservation-id-cancel={reservation_id}
+        value={reservation_id}
+      >
+        Cancel
+      </button>
+
         </td>
 
       </tr>
@@ -91,21 +96,25 @@ export default function ReservationsTable({ reservations, loadDashboard }) {
   );
 
   return (
-    <table className="table">
+    <div className="table-wrap">
+
+    <table className="table table-responsive-md table-hover ">
       <thead>
-        <tr>
-          <th scope="col">First Name</th>
-          <th scope="col">Last Name</th>
-          <th scope="col">Mobile Number</th>
-          <th scope="col">People</th>
-          <th scope="col">Reservation Date</th>
-          <th scope="col">Reservation Time</th>
-          <th scope="col">Status</th>
+        <tr> {}
+          <th className="text-center"scope="col">First Name</th>
+          <th className="text-center"scope="col">Last Name</th>
+          <th className="text-center"scope="col">Mobile Number</th>
+          <th className="text-center"scope="col">People</th>
+          <th className="text-center"scope="col">Reservation Date</th>
+          <th className="text-center"scope="col">Reservation Time</th>
+          <th className="text-center"scope="col">Status</th>
         </tr>
       </thead>
 
       <tbody>{rows}</tbody>
 
     </table>
+
+    </div>
   );
 }

@@ -16,8 +16,12 @@ export default function NewTable({ loadDashboard }) {
 
   //updates form data as the user types into the form
   function handleChange({ target }) {
-	setFormData({ ...formData, [target.name]: target.name === "capacity" ? Number(target.value) : target.value });
-}
+    setFormData({
+      ...formData,
+      [target.name]:
+        target.name === "capacity" ? Number(target.value) : target.value,
+    });
+  }
 
   //submit handler for the new table form
   async function handleSubmit(event) {
@@ -43,9 +47,9 @@ export default function NewTable({ loadDashboard }) {
       foundError = { message: "Table name must be at least 2 characters." };
     }
 
-	if(formData.capacity < 1) {
-		foundError = { message: "Capacity cannot be less than 1."}
-	}
+    if (formData.capacity < 1) {
+      foundError = { message: "Capacity cannot be less than 1." };
+    }
 
     setError(foundError);
 
@@ -53,36 +57,55 @@ export default function NewTable({ loadDashboard }) {
   }
 
   return (
-    <form>
+    <div>
       <ErrorAlert error={error} />
-
-      <label htmlFor="table_name">Table Name:</label>
-      <input
-        name="table_name"
-        id="table_name"
-        type="text"
-        onChange={handleChange}
-        value={formData.table_name}
-        required
-      />
-
-      <label htmlFor="capacity">Capacity:</label>
-      <input
-        id="capacity"
-        type="number"
-        name="capacity"
-        onChange={handleChange}
-        value={formData.capacity}
-        min="1"
-        required
-      />
-
-      <button type="submit" onClick={handleSubmit}>
-        Submit
-      </button>
-      <button type="button" onClick={history.goBack}>
-        Cancel
-      </button>
-    </form>
+      <form className="row">
+        <div className="col-md-6 mb-3">
+          <label htmlFor="table_name" className="form-label">
+            Table Name:
+          </label>
+          <input
+            className="form-control"
+            name="table_name"
+            id="table_name"
+            type="text"
+            onChange={handleChange}
+            value={formData.table_name}
+            required
+          />
+        </div>
+        <div className="col-md-6 mb-3">
+          <label htmlFor="capacity" className="form-label">
+            Capacity:
+          </label>
+          <input
+            className="form-control"
+            id="capacity"
+            type="number"
+            name="capacity"
+            onChange={handleChange}
+            value={formData.capacity}
+            min="1"
+            required
+          />
+        </div>
+        <div className="btn-group col-md-3">
+          <button
+            className="btn btn-success p-1"
+            type="submit"
+            onClick={handleSubmit}
+          >
+            Submit
+          </button>
+          <button
+            className="btn btn-danger p-1"
+            type="button"
+            onClick={history.goBack}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

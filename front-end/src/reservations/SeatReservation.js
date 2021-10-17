@@ -46,7 +46,6 @@ export default function SeatReservation({ tables, loadDashboard }) {
 
     //if check to call validation function, returns true or false
     if (validateSeat()) {
-      
       //* API call here
       await seatTable(reservation_id, table_id, abortController.signal)
         .then(loadDashboard)
@@ -109,30 +108,45 @@ export default function SeatReservation({ tables, loadDashboard }) {
   }
 
   return (
-    <form className="form-select">
-      {errorsJSX()}
-      <ErrorAlert error={reservationsApiError} />
-      <ErrorAlert error={apiErrors} />
+    <div>
+      <form>
+        {errorsJSX()}
+        <ErrorAlert error={reservationsApiError} />
+        <ErrorAlert error={apiErrors} />
 
-      <label htnlfor="table_id">Choose Table</label>
+        <label htnlfor="table_id" className="h3 p-1">Choose table to seat reservation</label>
+       
+        <div className="p-1">
+          <select
+            className="form-select p-1"
+            name="table_id"
+            id="table_id"
+            value={table_id}
+            onChange={handleChange}
+          >
+            <option value={0}>Select a Table</option>
+            {availableTables()}
+          </select>
+        </div>
 
-      <select
-        name="table_id"
-        id="table_id"
-        value={table_id}
-        onChange={handleChange}
-      >
-        <option value={0}>Choose a Table</option>
-        {availableTables()}
-      </select>
+        <div className="btn-group pt-3 p-1">
+          <button
+            className="btn btn-success"
+            type="submit"
+            onClick={handleSubmit}
+          >
+            Submit
+          </button>
 
-      <button type="submit" onClick={handleSubmit}>
-        Submit
-      </button>
-
-      <button type="button" onClick={history.goBack}>
-        Cancel
-      </button>
-    </form>
+          <button
+            className="btn btn-danger"
+            type="button"
+            onClick={history.goBack}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

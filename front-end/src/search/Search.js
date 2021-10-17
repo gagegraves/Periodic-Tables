@@ -17,43 +17,55 @@ export default function Search() {
 
   //invoked upon search submission, returns search results
   async function handleSubmit(event) {
-	event.preventDefault();
-	const abortController = new AbortController();
-	setError(null);
+    event.preventDefault();
+    const abortController = new AbortController();
+    setError(null);
 
-	//*API call
-	await listReservations({ mobile_number: mobileNumber }, abortController.signal)
-		.then(setReservations)
-        .then(setRenderReservationsTable(true))
-		.catch(setError);
+    //*API call
+    await listReservations(
+      { mobile_number: mobileNumber },
+      abortController.signal
+    )
+      .then(setReservations)
+      .then(setRenderReservationsTable(true))
+      .catch(setError);
 
-	return () => abortController.abort();
-}
-
+    return () => abortController.abort();
+  }
 
   return (
     <div>
-        <h3>Search</h3>
-        <form>
-			<ErrorAlert error={error} />
+      <h3>Search</h3>
+      <form>
+        <ErrorAlert error={error} />
 
-			<label htmlFor="mobile_number">Enter a customer's phone number:</label>
-			<input 
-				name="mobile_number"
-				id="mobile_number"
-				type="tel"
-				onChange={handleChange}
-				value={mobileNumber}
-				required
-			/>
+        <label htmlFor="mobile_number">
+          Enter a customer's phone number below:
+        </label>
+        <div>
+          <input
+            className="m-2"
+            name="mobile_number"
+            id="mobile_number"
+            type="tel"
+            onChange={handleChange}
+            value={mobileNumber}
+            required
+          />
 
-			<button type="submit" onClick={handleSubmit}>Find</button>
-		</form>
+          <button
+            className="btn btn-success"
+            type="submit"
+            onClick={handleSubmit}
+          >
+            Find
+          </button>
+        </div>
+      </form>
 
-        { renderReservationsTable &&    
-      <ReservationsTable reservations={reservations} />
-        }   
-		
+      {renderReservationsTable && (
+        <ReservationsTable reservations={reservations} />
+      )}
     </div>
   );
 }

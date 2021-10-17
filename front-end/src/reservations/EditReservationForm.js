@@ -177,92 +177,122 @@ export default function EditReservationForm({ loadDashboard }) {
     ));
   }
   
-  return (
-    <div>
-      <h4>Edit Reservation</h4>
-      {errorsJSX()}
-      <ErrorAlert error={apiError} />
-      {reservationsError.length > 0 && <ErrorAlert error={reservationsError} />}
-      <div>
-        <form>
-          <label htmlFor="first_name">
-            First Name
-            <input
-              id="first_name"
-              type="text"
-              name="first_name"
-              onChange={handleChange}
-              value={formData.first_name}
-              minLength="2"
-              required
-            />
-          </label>
-          <label htmlFor="last_name">
-            Last Name
-            <input
-              id="last_name"
-              type="text"
-              name="last_name"
-              onChange={handleChange}
-              value={formData.last_name}
-              minLength="2"
-              required
-            />
-          </label>
-          <label htmlFor="mobile_number">
-            Mobile Number
-            <input
-              id="mobile_number"
-              type="tel"
-              name="mobile_number"
-              onChange={handleChange}
-              value={formData.mobile_number}
-              required
-            />
-          </label>
-          <label htmlFor="reservation_date">
-            Reservation Date
-            <input
-              id="reservation_date"
-              type="date"
-              name="reservation_date"
-              onChange={handleChange}
-              value={formData.reservation_date}
-              required
-            />
-          </label>
-          <label htmlFor="reservation_time">
-            Reservation Time
-            <input
-              id="reservation_time"
-              type="time"
-              name="reservation_time"
-              onChange={handleChange}
-              value={formData.reservation_time}
-              required
-            />
-          </label>
-          <label htmlFor="people">
-            Number of Guests
-            <input
-              id="people"
-              type="number"
-              name="people"
-              onChange={handleChange}
-              value={formData.people}
-              min="1"
-              required
-            />
-          </label>
-          <br />
-          <button type="submit" onClick={handleSubmit}>
-            Submit
-          </button>
-          <button type="button" onClick={() => history.goBack()}>
-            Cancel
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-}
+      return (
+        <div>
+          <div>
+            <h3 className="mb-3 pt-2">Edit Reservation</h3>
+          </div>
+          {errorsJSX()}
+          <ErrorAlert error={apiError} />
+           {reservationsError.length > 0 && <ErrorAlert error={reservationsError} />}
+          <div>
+            <form className="row">
+              <div className="col-md-6 mb-3">
+                <label htmlFor="first_name" className="form-label">
+                  First Name
+                </label>
+                <input
+                  className="form-control"
+                  id="first_name"
+                  type="text"
+                  name="first_name"
+                  onChange={handleChange}
+                  value={formData.first_name}
+                  minLength="2"
+                  required
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label htmlFor="last_name" className="form-label">
+                  Last Name
+                </label>
+                <input
+                  className="form-control"
+                  id="last_name"
+                  type="text"
+                  name="last_name"
+                  onChange={handleChange}
+                  value={formData.last_name}
+                  minLength="2"
+                  required
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label htmlFor="mobile_number" className="form-label">
+                  Mobile Number
+                </label>
+                <input
+                  className="form-control"
+                  id="mobile_number"
+                  type="tel"
+                  name="mobile_number"
+                  onChange={handleChange}
+                  value={formData.mobile_number}
+                  required
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label htmlFor="reservation_date" className="form-label">
+                  Reservation Date
+                </label>
+                <input
+                  className="form-control"
+                  id="reservation_date"
+                  type="date"
+                  name="reservation_date"
+                  onChange={handleChange}
+                  value={formData.reservation_date}
+                  required
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label htmlFor="reservation_time" className="form-label">
+                  Reservation Time
+                </label>
+                <input
+                  className="form-control"
+                  id="reservation_time"
+                  type="time"
+                  name="reservation_time"
+                  onChange={handleChange}
+                  value={formData.reservation_time}
+                  required
+                />
+              </div>
+              <div className="col-md-6 c">
+                <label htmlFor="people" className="form-label">
+                  Number of Guests
+                </label>
+                <input
+                  className="form-control"
+                  id="people"
+                  type="number"
+                  name="people"
+                  onChange={handleChange}
+                  value={formData.people}
+                  min="1"
+                  required
+                />
+              </div>
+              <div className="btn-group col-md-3 ">
+                <button
+                  className="btn btn-success p-1"
+                  type="submit"
+                  onClick={handleSubmit}
+                >
+                  Submit
+                </button>
+                <button
+                  className="btn btn-danger p-1"
+                  type="button"
+                  onClick={() => history.goBack()}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      );
+    }
+    

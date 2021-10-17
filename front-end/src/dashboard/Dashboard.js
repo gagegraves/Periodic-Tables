@@ -6,29 +6,70 @@ import ReservationsTable from "./ReservationsTable";
 import TablesTable from "./TablesTable";
 
 //defines the dashboard page
-function Dashboard({ date, reservations, reservationsError, tables, tablesError , loadDashboard}) {
+function Dashboard({
+  date,
+  reservations,
+  reservationsError,
+  tables,
+  tablesError,
+  loadDashboard,
+}) {
   const history = useHistory();
-  
+
   return (
     <main>
-      <h1>Dashboard</h1>
       <div className="d-md-flex mb-3">
-        <h4 className="mb-0">Reservations for {date}</h4>
+        <h2 className="mb-0 pt-2">Reservations for {date}</h2>
+      </div>
+
+      <div className="btn-group pb-4">
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={() => history.push(`/dashboard?date=${previous(date)}`)}
+        >
+          Previous
+        </button>
+        <button
+          className="btn btn-secondary "
+          type="button"
+          onClick={() => history.push(`/dashboard?date=${today()}`)}
+        >
+          Today
+        </button>
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={() => history.push(`/dashboard?date=${next(date)}`)}
+        >
+          Next
+        </button>
       </div>
 
       <ErrorAlert error={reservationsError} />
-      <ReservationsTable reservations={reservations} loadDashboard={loadDashboard} />
 
-      <h4 className="mb-0">Tables</h4>
+      <div className="row">
+        <div className="col-11">
+          <ReservationsTable
+            reservations={reservations}
+            loadDashboard={loadDashboard}
+          />
+        </div>
+      </div>
+
+      <div className="d-md-flex mb-3">
+        <h3 >Tables</h3>
+      </div>
+
       <ErrorAlert error={tablesError} />
-      <TablesTable tables={tables} loadDashboard={loadDashboard} />
 
-      <button type="button" onClick={() => history.push(`/dashboard?date=${previous(date)}`)}>Previous</button>
-      <button type="button" onClick={() => history.push(`/dashboard?date=${today()}`)}>Today</button>
-      <button type="button" onClick={() => history.push(`/dashboard?date=${next(date)}`)}>Next</button>
+      <div className="row">
+        <div className="col-11">
+          <TablesTable tables={tables} loadDashboard={loadDashboard} />
+        </div>
+      </div>
     </main>
   );
 }
 
 export default Dashboard;
-

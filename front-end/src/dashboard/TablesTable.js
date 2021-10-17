@@ -3,7 +3,7 @@ import { freeTable } from "../utils/api";
 export default function TablesTables({ tables, loadDashboard }) {
   if (!tables || tables.length < 1) {
     return (
-      <p>No tables laoded.</p>
+      <p>No tables loaded.</p>
     )
   };
 
@@ -23,34 +23,35 @@ export default function TablesTables({ tables, loadDashboard }) {
   const rows = tables.map(
     ({ table_id, table_name, capacity, status }, index) => (
       <tr key={table_id}>
-        <td>{table_id}</td>
-        <td>{table_name}</td>
-        <td>{capacity}</td>
-        <td data-table-id-status={table_id}>{status}</td>
+        <th scope="row" className="text-center">{table_id}</th>
+        <td className="text-center">{table_name}</td>
+        <td className="text-center">{capacity}</td>
+        <td data-table-id-status={table_id} className="text-center">{status}</td>
         {status === "occupied" && (
-          <td>
+          <td className="">
             <button 
               data-table-id-finish={table_id}
               value ={table_id}
               onClick={handleFinish} 
               type="button"
+              className="btn btn-warning rounded-pill"
               >
               Finish
             </button>
           </td>
         )}
-      </tr>
+          </tr>
     )
   );
 
   return (
-    <table className="table">
+    <table className="table table-hover">
       <thead>
         <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Table Name</th>
-          <th scope="col">Capacity</th>
-          <th scope="col">Status</th>
+          <th scope="col" className="text-center">ID</th>
+          <th scope="col" className="text-center">Table Name</th>
+          <th scope="col" className="text-center">Capacity</th>
+          <th scope="col" className="text-center">Status</th>
         </tr>
       </thead>
       <tbody>{rows}</tbody>
