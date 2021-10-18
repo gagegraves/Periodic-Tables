@@ -95,7 +95,7 @@ async function validateReservationDate(req, res, next) {
   console.log("~ todaysDate", todaysDate);
 
   const reserveDate = new Date(`${req.body.data.reservation_date}T${req.body.data.reservation_time}:00.000`);
-  
+
   console.log("~ reserveDate", reserveDate);
   
   if (reserveDate.getDay() === 2) {
