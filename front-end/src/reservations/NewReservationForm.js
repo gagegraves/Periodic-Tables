@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
+import formatReservationTime from "../utils/format-reservation-time"
 import {
   createReservation,
   editReservation,
@@ -53,12 +54,14 @@ export default function NewReservationForm({ loadDashboard, edit }) {
 
       setFoundReservation(apiReservation);
 
+      formatReservationTime(apiReservation)
+
       setFormData({
         first_name: apiReservation.first_name,
         last_name: apiReservation.last_name,
         mobile_number: apiReservation.mobile_number,
         reservation_date: apiReservation.reservation_date,
-        reservation_time: apiReservation.reservation_time.slice(0, -3),
+        reservation_time: apiReservation.reservation_time,
         people: apiReservation.people,
       });
     }
@@ -88,7 +91,6 @@ export default function NewReservationForm({ loadDashboard, edit }) {
     if (validateDate(foundErrors) && validateFields(foundErrors)) {
       //* API call here
       if (edit) {
-        console.log("edit: ", formData);
         editReservation(reservation_id, formData, abortController.signal)
           .then(loadDashboard)
           .then(() =>
@@ -96,7 +98,6 @@ export default function NewReservationForm({ loadDashboard, edit }) {
           )
           .catch(setApiError);
       } else {
-        console.log("new: ", formData);
         createReservation(formData, abortController.signal)
           .then(loadDashboard)
           .then(() =>
@@ -114,8 +115,7 @@ export default function NewReservationForm({ loadDashboard, edit }) {
   //the validation function to ensure that the date and time being set for the reservation are during the restaurants open hours
   function validateDate(foundErrors) {
     const reserveDate = new Date(
-      `${formData.reservation_date}T${formData.reservation_time}:00.000`
-    );
+      `${formData.reservation_date}T${formData.reservation_time}:00.000`);
     const todaysDate = new Date();
 
     if (reserveDate.getDay() === 2) {
