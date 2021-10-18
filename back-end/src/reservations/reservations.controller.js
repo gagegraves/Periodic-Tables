@@ -87,16 +87,8 @@ async function validateReservationId(req, res, next) {
 
 //makes sure the data sent in from the request matches the restaurants rules for reservations
 async function validateReservationDate(req, res, next) {
-
-  console.log(req.body.data)
-
   const todaysDate = new Date();
-
-  console.log("~ todaysDate", todaysDate);
-
   const reserveDate = new Date(`${req.body.data.reservation_date}T${req.body.data.reservation_time}:00.000`);
-
-  console.log("~ reserveDate", reserveDate);
   
   if (reserveDate.getDay() === 2) {
     return next({
@@ -110,37 +102,6 @@ async function validateReservationDate(req, res, next) {
       status: 400,
       message:
         "'reservation_date' and 'reservation_time' field must be in the future",
-    });
-  }
-
-  if (
-    reserveDate.getHours() < 10 ||
-    (reserveDate.getHours() === 10 && reserveDate.getMinutes() < 30)
-  ) {
-    return next({
-      status: 400,
-      message: "'reservation_time' field: restaurant is not open until 10:30AM",
-    });
-  }
-
-  if (
-    reserveDate.getHours() > 22 ||
-    (reserveDate.getHours() === 22 && reserveDate.getMinutes() >= 30)
-  ) {
-    return next({
-      status: 400,
-      message: "'reservation_time' field: restaurant is closed after 10:30PM",
-    });
-  }
-
-  if (
-    reserveDate.getHours() > 21 ||
-    (reserveDate.getHours() === 21 && reserveDate.getMinutes() > 30)
-  ) {
-    return next({
-      status: 400,
-      message:
-        "'reservation_time' field: reservation must be made at least an hour before closing (10:30PM)",
     });
   }
 
