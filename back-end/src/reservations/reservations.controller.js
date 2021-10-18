@@ -88,10 +88,13 @@ async function validateReservationId(req, res, next) {
 //makes sure the data sent in from the request matches the restaurants rules for reservations
 async function validateReservationDate(req, res, next) {
   const todaysDate = new Date();
+  console.log("~ todaysDate", todaysDate);
   const tzChange = new Date(
     `${req.body.data.reservation_date}T${req.body.data.reservation_time}:00.000`
   ).toISOString();
   const reserveDate = new Date(tzChange);
+  console.log("~ tzChange", tzChange);
+  console.log("~ reserveDate", reserveDate);
 
   if (reserveDate.getDay() === 2) {
     return next({
