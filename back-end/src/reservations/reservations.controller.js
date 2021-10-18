@@ -87,8 +87,9 @@ async function validateReservationId(req, res, next) {
 
 //makes sure the data sent in from the request matches the restaurants rules for reservations
 async function validateReservationDate(req, res, next) {
+  const { reservation_date, reservation_time} = req.body;
   const todaysDate = new Date();
-  const reserveDate = new Date(`${req.body.data.reservation_date}T${req.body.data.reservation_time}:00.000`);
+  const reserveDate = new Date(`${reservation_date}T${reservation_time}`);
   
   if (reserveDate.getDay() === 2) {
     return next({
@@ -97,16 +98,14 @@ async function validateReservationDate(req, res, next) {
     });
   }
 
-  if (reserveDate < todaysDate) {
+  if (Date.parse(reserveDate) <= Date.parse(todaysDate))
     return next({
       status: 400,
-      message:
-        "'reservation_date' and 'reservation_time' field must be in the future",
+      message: `Your reservation cannot be made for a date or time of the past. Please select a future date.`,
     });
-  }
 
-  next();
-}
+    next()
+  }
 
 //verifies that the status of the reservation  in a update request allows it to be updated, i.e. it's
 //not already a finished table
